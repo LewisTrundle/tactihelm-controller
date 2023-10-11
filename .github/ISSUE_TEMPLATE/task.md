@@ -2,7 +2,7 @@
 name: Task
 about: Provide a simple task to complete
 title: ''
-labels: 
+labels: ["task"]
 assignees: ''
 
 ---
@@ -14,9 +14,9 @@ assignees: ''
 
 ## Priority
 
-(- high priority
-- medium priority
-- low priority)
+(1 - high priority
+2 - medium priority
+3 - low priority)
 
 
 ## Time Estimate
