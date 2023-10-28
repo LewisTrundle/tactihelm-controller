@@ -1,20 +1,24 @@
 import { createContext, useState } from 'react';
 
+
 const defaultContext = {
-  connectedBleDevice: null,
-  setConnectedBleDevice: (device) => {}
+  connectedBCDevice: null,
+  connectedBLEDevice: null,
+  setConnectedDevices: (d1, d2) => {}
 };
 
 export const DeviceContext = createContext(defaultContext);
 
 export const DeviceContextProvider = props => {
-  const setConnectedBleDevice = (device) => {
-    setState({ ...state, connectedBleDevice: device });
-  };
+  const setConnectedDevices = (d1, d2) => {
+    setState({ ...state, connectedBLEDevice: d1,  connectedBCDevice: d2});
+  }
+
   const initState = {
     ... defaultContext,
-    setConnectedBleDevice: setConnectedBleDevice
+    setConnectedDevices: setConnectedDevices
   };
+
   const [state, setState] = useState(initState);
 
   return (

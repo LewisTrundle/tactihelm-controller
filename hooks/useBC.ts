@@ -1,28 +1,27 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Platform } from "react-native";
 import RNBluetoothClassic, { BluetoothDevice } from 'react-native-bluetooth-classic';
+import { DeviceContext } from "./DeviceContextProvider";
+import { BluetoothApi } from "./BluetoothApis";
 
-interface BluetoothClassicApi {
+interface BluetoothClassicApi extends BluetoothApi {
+  isBluetoothSupported: boolean;
+  isBluetoothEnabled: boolean;
+  pairedDevices: BluetoothDevice[];
   deviceSupportsBluetooth(): Promise<void>;
   bluetoothIsEnabled(): Promise<void>;
   requestBluetoothEnabled(): Promise<void>;
   openBluetoothSettings(): void;
   getPairedDevices(): Promise<void>;
-  discoverUnpairedDevices(): Promise<void>;
-  connectToBluetoothDevice(): Promise<void>;
   writeToDevice(text: string): Promise<void>;
-  isBluetoothSupported: boolean;
-  isBluetoothEnabled: boolean;
-  pairedDevices: BluetoothDevice[];
-  unpairedDevices: BluetoothDevice[];
-}
+};
+
 
 function useBC(): BluetoothClassicApi {
+  const [deviceList, setDeviceList] = useState<BluetoothDevice[]>([]);
   const [isBluetoothSupported, setIsBluetoothSupported] = useState<boolean>(false);
   const [isBluetoothEnabled, setIsBluetoothEnabled] = useState<boolean>(false);
   const [pairedDevices, setPairedDevices] = useState<BluetoothDevice[]>([]);
-  const [unpairedDevices, setUnpairedDevices] = useState<BluetoothDevice[]>([]);
-  const [inDiscovery, setInDiscovery] = useState<boolean>(false);
 
 
   useEffect(() => {
@@ -32,6 +31,54 @@ function useBC(): BluetoothClassicApi {
     };
   }, []);
 
+  const startScan = async (): Promise<void> => {
+    if (Platform.OS === 'android') {
+      try {
+        console.log("in discovery")
+        const unpaired = await RNBluetoothClassic.startDiscovery();
+        setDeviceList(unpaired)
+        unpaired.forEach((device) => console.log(device.name, device.address, device.bonded));
+      } catch (err) {
+        console.error(err);
+      }
+    } else if (Platform.OS === 'ios') {
+      console.log("ios platform");
+    } else {
+      console.log("unrecognised platform");
+    }
+  }
+
+  const stopScan = async (): Promise<void> => {
+    if (Platform.OS === 'android') {
+      try {
+        const cancelled = await RNBluetoothClassic.cancelDiscovery();
+      } catch (err) {
+        console.error(err);
+      }
+    } else if (Platform.OS === 'ios') {
+      console.log("ios platform");
+    } else {
+      console.log("unrecognised platform");
+    }
+  }
+
+  const connectToDevice = async (device: BluetoothDevice): Promise<void> => {
+    try {
+      const isConnected = await device.connect();
+      console.log("device has been connected: ", isConnected)
+    } catch (err) {
+      console.log("FAILED TO CONNECT TO DEVICE", device?.name, JSON.stringify(err));
+    }
+  }
+
+  const disconnectFromDevice = async (device: BluetoothDevice): Promise<void> => {
+    try {
+      const disconnected = await device.disconnect();
+      console.log("device has been disconnected: " + disconnected)
+    } catch (err) {
+      console.log("FAILED TO DISCONNECT", JSON.stringify(err));
+    }
+  };
 
   const deviceSupportsBluetooth = async (): Promise<void> => {
     try {
@@ -85,59 +132,6 @@ function useBC(): BluetoothClassicApi {
     }
   };
 
-  const discoverUnpairedDevices = async (): Promise<void> => {
-    if (Platform.OS === 'android') {
-      setInDiscovery(true);
-      try {
-        const unpaired = await RNBluetoothClassic.startDiscovery();
-        setUnpairedDevices(unpaired)
-        console.log("Unpaired devices are:");
-        unpaired.forEach((device) => console.log(device.name, device.address, device.bonded));
-      } catch (err) {
-        console.error(err);
-      } finally {
-        cancelBluetoothDiscovery();
-      }
-    } else if (Platform.OS === 'ios') {
-      console.log("ios platform");
-    } else {
-      console.log("unrecognised platform");
-    }
-  }
-
-  const cancelBluetoothDiscovery = async (): Promise<void> => {
-    if (Platform.OS === 'android') {
-      try {
-        const cancelled = await RNBluetoothClassic.cancelDiscovery();
-        setInDiscovery(false);
-        console.log("cancelled discovery", cancelled);
-      } catch (err) {
-        console.error(err);
-      }
-    } else if (Platform.OS === 'ios') {
-      console.log("ios platform");
-    } else {
-      console.log("unrecognised platform");
-    }
-  }
-
-  const pairBluetoothDevice = async () => {
-    try {
-      const pairedDevice = await RNBluetoothClassic.pairDevice("98:D3:51:FD:A2:55");
-      console.log("Is the new device paired: " + pairedDevice.name, pairedDevice.address, pairedDevice.bonded);
-    } catch (err) {
-      console.error(err); 
-    }
-  }
-
-  const connectToBluetoothDevice = async (): Promise<void> => {
-    try {
-      const isConnected = await RNBluetoothClassic.connectToDevice("98:D3:51:FD:A2:55");
-      console.log(" 98:D3:51:FD:A2:55 is connected: " + JSON.stringify(isConnected));
-    } catch (err) {
-      console.error(err);
-    }
-  }
 
   const writeToDevice = async (text: string): Promise<void> => {
     try {
@@ -154,14 +148,16 @@ function useBC(): BluetoothClassicApi {
     requestBluetoothEnabled,
     openBluetoothSettings,
     getPairedDevices,
-    discoverUnpairedDevices,
-    connectToBluetoothDevice,
+    startScan,
+    stopScan,
+    connectToDevice,
+    disconnectFromDevice,
     writeToDevice,
+    deviceList,
     isBluetoothSupported,
     isBluetoothEnabled,
     pairedDevices,
-    unpairedDevices
   };
 }
 
-export default useBC;
+export { useBC, BluetoothDevice };

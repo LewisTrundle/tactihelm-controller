@@ -71,7 +71,6 @@ function permissions(): PermissionsApi {
         );
         const isGranted = granted === PermissionsAndroid.RESULTS.GRANTED;
         setArePermissionsGranted(isGranted)
-        console.log("are permissions granted", isGranted)
         return isGranted;
       } else {
         const isAndroid31PermissionsGranted = await requestAndroid31Permissions();

@@ -1,5 +1,5 @@
 import { useBLE, Device } from "./useBLE";
-import useBC from "./useBC";
+import { useBC, BluetoothDevice } from "./useBC";
 import permissions from "./permissions";
 
-export { useBLE, useBC, permissions, Device }
+export { useBLE, useBC, permissions, Device, BluetoothDevice }

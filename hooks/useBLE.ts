@@ -7,39 +7,32 @@ import {
   Device,
 } from "react-native-ble-plx";
 import { DeviceContext } from "./DeviceContextProvider";
+import { BluetoothApi } from "./BluetoothApis";
 
 import { Buffer } from "buffer";
 
 const HEART_RATE_UUID = "6a4e3200-667b-11e3-949a-0800200c9a66";
 const HEART_RATE_CHARACTERISTIC = "6a4e3203-667b-11e3-949a-0800200c9a66";
 
-interface BluetoothLowEnergyApi {
-  startBleScan(): void;
-  stopBleScan(): void;
-  connectToDevice: (device: Device) => Promise<void>;
-  disconnectFromDevice: (device: Device) => void;
-  getConnectedDevice: () => Device;
-  allDevices: Device[];
-  connectedBleDevice: Device | null;
+interface BluetoothLowEnergyApi extends BluetoothApi {
   heartRate: number;
 }
 
 function useBLE(): BluetoothLowEnergyApi {
   const bleManager = useMemo(() => new BleManager(), []);
-  const [allDevices, setAllDevices] = useState<Device[]>([]);
-  const { connectedBleDevice, setConnectedBleDevice } = useContext(DeviceContext);
+  const [deviceList, setDeviceList] = useState<Device[]>([]);
   const [heartRate, setHeartRate] = useState<number>(0);
 
   const isDuplicateDevice = (devices: Device[], nextDevice: Device) =>
     devices.findIndex((device) => nextDevice.id === device.id) > -1;
 
-  const startBleScan = (): void =>
+  const startScan = (): void =>
     bleManager.startDeviceScan(null, null, (error, device) => {
       if (error) {
         console.log(JSON.stringify(error));
       }
       if (device && device.name != null) {
-        setAllDevices((prevState: Device[]) => {
+        setDeviceList((prevState: Device[]) => {
           if (!isDuplicateDevice(prevState, device)) {
             return [...prevState, device];
           }
@@ -48,28 +41,16 @@ function useBLE(): BluetoothLowEnergyApi {
       }
     });
 
-  const stopBleScan = (): void => {
+  const stopScan = (): void => {
     bleManager.stopDeviceScan();
   };
 
-  const BleDisconnectListener = (device: Device) =>
-    bleManager.onDeviceDisconnected(device.id, (error: BleError, device: Device) => {
-      if (error) {
-        console.log(JSON.stringify(error));
-      }
-      setConnectedBleDevice(connectedBleDevice);
-      console.log("BLUETOOTH CONNECTION TO" + device.name + " WAS DISCONNECTED");
-    });
-
-
   const connectToDevice = async (device: Device): Promise<void> => {
     try {
-      stopBleScan();
+      stopScan();
       const deviceConnection = await bleManager.connectToDevice(device.id);
-      setConnectedBleDevice(deviceConnection);
-      BleDisconnectListener(deviceConnection);
-      // await discoverDeviceServices(deviceConnection);
-      // await startStreamingData(deviceConnection);
+      //await discoverDeviceServices(deviceConnection);
+      //await startStreamingData(deviceConnection);
     } catch (e) {
       console.log("FAILED TO CONNECT TO DEVICE", device?.name, JSON.stringify(e));
     }
@@ -77,8 +58,8 @@ function useBLE(): BluetoothLowEnergyApi {
 
   const disconnectFromDevice = async (device: Device): Promise<void> => {
     try {
-      const unconnectedDevice = await bleManager.cancelDeviceConnection(device.id);
-      setConnectedBleDevice(null);
+      const unconnectedDevice = await device.cancelConnection();
+      console.log("device has been disconnected: " + unconnectedDevice)
       setHeartRate(0);
     } catch (err) {
       console.log("FAILED TO DISCONNECT", JSON.stringify(err));
@@ -119,11 +100,6 @@ function useBLE(): BluetoothLowEnergyApi {
     }
   };
 
-  const getConnectedDevice = (): Device => {
-    console.log("In here the connect device is ", connectedBleDevice?.name)
-    setConnectedBleDevice(connectedBleDevice)
-    return connectedBleDevice;
-  }
 
   const onHeartRateUpdate = (
     error: BleError | null,
@@ -163,13 +139,11 @@ function useBLE(): BluetoothLowEnergyApi {
   };
 
   return {
-    startBleScan,
-    stopBleScan,
+    startScan,
+    stopScan,
     connectToDevice,
     disconnectFromDevice,
-    getConnectedDevice,
-    allDevices,
-    connectedBleDevice,
+    deviceList,
     heartRate,
   };
 }

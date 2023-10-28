@@ -4,11 +4,13 @@ import { useBC, permissions } from '../hooks';
 import { AlertModal } from "../components";
 import { homeStyles } from "../styles";
 import { DeviceContext } from "../hooks/DeviceContextProvider";
+import { IconButton } from '../components/IconButton';
+import { BluetoothTypes } from '../constants/BluetoothTypes';
 
 const HomeScreen = ({ navigation }) => {
   const { isBluetoothEnabled, bluetoothIsEnabled, requestBluetoothEnabled } = useBC();
   const { arePermissionsGranted, requestPermissions, checkPermissions } = permissions();
-  const { connectedBleDevice } = useContext(DeviceContext);
+  const { connectedBLEDevice, connectedBCDevice } = useContext(DeviceContext);
 
   useEffect(() => {
     bluetoothIsEnabled();
@@ -41,11 +43,11 @@ const HomeScreen = ({ navigation }) => {
       >
       </AlertModal>
       <View style={homeStyles.contentContainer}>
-        <Text style={homeStyles.footerText}>Connect to bike radar: {connectedBleDevice?.name}</Text>
+        <IconButton iconName="basketball" onPress={()=>navigation.navigate("Device", {conn: BluetoothTypes.BC})} size={50} color="white" />
       </View>
       <View style={homeStyles.footerContainer}>
-        <Text style={homeStyles.footerText}>Connect to bike radar: {connectedBleDevice?.name}</Text>
-        <Text style={homeStyles.footerText}>Connect to helmet: </Text>
+        <Text style={homeStyles.footerText}>Connect to bike radar: {connectedBLEDevice?.name}</Text>
+        <Text style={homeStyles.footerText}>Connect to helmet: {connectedBCDevice?.name}</Text>
       </View>
     </SafeAreaView>
   );

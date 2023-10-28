@@ -51,6 +51,8 @@ const homeStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.grey,
+    justifyContent: "center",
+    alignItems: "center",
   },
   contentContainer: {
     flex: 1
@@ -58,6 +60,7 @@ const homeStyles = StyleSheet.create({
   footerContainer: {
     backgroundColor: colors.white,
     height: 60,
+    width: metrics.fullWidth,
     bottom: 30,
   },
   footerText: {

@@ -1,21 +1,28 @@
 import { SafeAreaView, StatusBar, View, Text, TouchableWithoutFeedback } from "react-native";
-import { useEffect, useState } from "react";
-import { useBLE, permissions, Device } from "../hooks";
+import { useEffect, useState, useContext } from "react";
+import { useBLE, useBC, permissions, Device, BluetoothDevice } from "../hooks";
 import { OpacityButton, ItemList } from "../components";
 import { deviceScreenStyles } from "../styles";
+import { BluetoothTypes } from "../constants/BluetoothTypes";
 import Icon from 'react-native-vector-icons/Ionicons';
+import { DeviceContext } from '../hooks/DeviceContextProvider';
 
 
-const DeviceScreen = ({ navigation }) => {
-  const { startBleScan, stopBleScan, connectToDevice, disconnectFromDevice, allDevices, connectedBleDevice } = useBLE();
+const DeviceScreen = ({ navigation, route }) => {
+  const { conn } = route.params;
+  const isBLE = conn === BluetoothTypes.BLE; 
+
+  const { startScan, stopScan, connectToDevice, disconnectFromDevice, deviceList } = isBLE ? useBLE() : useBC();
+  const { connectedBLEDevice, connectedBCDevice, setConnectedDevices } = useContext(DeviceContext);
+  const [connectedDevice, setConnectedDevice] = useState(connectedBCDevice || connectedBLEDevice);
   const { requestPermissions } = permissions();
+  const [selectedDevice, setSelectedDevice] = useState<null | Device | BluetoothDevice>(null);
 
-  const [selectedDevice, setSelectedDevice] = useState<null | Device>(null);
 
   const scanForDevices = async () => {
     const isPermissionsEnabled = await requestPermissions();
     if (isPermissionsEnabled) {
-      startBleScan();
+      startScan();
     }
   };
 
@@ -28,41 +35,51 @@ const DeviceScreen = ({ navigation }) => {
   };
 
   const handleConnectPress = async (): Promise<void> => {
-    if (connectedBleDevice) {
-      console.log("ATTEMPTING DISCONNECT FROM ", connectedBleDevice?.name);
-      await disconnectFromDevice(connectedBleDevice);
+    if (connectedDevice) {
+      console.log("ATTEMPTING DISCONNECT FROM ", connectedDevice?.name);
+      await disconnectFromDevice(connectedDevice);
+      isBLE ? setConnectedDevices(null, connectedBCDevice) : setConnectedDevices(connectedBLEDevice, null);
     } else {
       console.log("ATTEMPTING CONNECT TO ", selectedDevice?.name);
       await connectToDevice(selectedDevice);
+      isBLE ? setConnectedDevices(selectedDevice, connectedBCDevice) : setConnectedDevices(connectedBLEDevice, selectedDevice);
     }
   };
 
+  // Use appropriate BC functions
   useEffect(() => {
-    scanForDevices();
-    return () => stopBleScan();
+    if ((isBLE && !connectedBLEDevice) || (!isBLE && !connectedBCDevice)) {
+      scanForDevices();
+    }
+    return () => {stopScan()};
   }, []);
+
+
+  useEffect(() => {
+    setConnectedDevice(isBLE ? connectedBLEDevice : connectedBCDevice);
+    console.log(connectedBLEDevice?.name, connectedBCDevice?.name)
+  }, [connectedBLEDevice, connectedBCDevice])
 
 
   return (
     <TouchableWithoutFeedback onPress={() => setSelectedDevice(null)}>
       <SafeAreaView style={deviceScreenStyles.container}>
         <StatusBar />
-        {connectedBleDevice ? (
+        {connectedDevice ? (
           <View style={deviceScreenStyles.devicesContainer}>
             <View style={deviceScreenStyles.deviceIconContainer}>
               <Icon name={"bluetooth"} size={100} color={"white"} />
             </View>
-            <Text style={deviceScreenStyles.deviceInfoText}>Name: {connectedBleDevice.name}</Text>
-            <Text style={deviceScreenStyles.deviceInfoText}>ID: {connectedBleDevice.id}</Text>
-            <Text style={deviceScreenStyles.deviceInfoText}>RSSI: {connectedBleDevice.rssi}</Text>
+            <Text style={deviceScreenStyles.deviceInfoText}>Name: {connectedDevice.name}</Text>
+            <Text style={deviceScreenStyles.deviceInfoText}>ID: {connectedDevice.id}</Text>
           </View>
         ) : (
           <View style={deviceScreenStyles.devicesContainer}>
-            {allDevices.length == 0 && (
-              <Text style={deviceScreenStyles.discoveryMessage}>Looking for devices</Text>
+            {deviceList.length == 0 && (
+              <Text style={deviceScreenStyles.discoveryMessage}>Looking for devices, this may take a while</Text>
             )}
               <ItemList 
-                items={allDevices}
+                items={deviceList}
                 style={"secondary"}
                 onPress={handleItemPress}
                 selectedItem={selectedDevice}
@@ -72,12 +89,12 @@ const DeviceScreen = ({ navigation }) => {
 
         <View style={deviceScreenStyles.buttonsContainer}>
           <OpacityButton 
-            text={`${connectedBleDevice ? 'Disconnect from' : 'Connect to'} ${selectedDevice ? selectedDevice.name : 'device'}`}
+            text={`${connectedDevice ? 'Disconnect from' : 'Connect to'} ${selectedDevice ? selectedDevice.name : 'device'}`}
             onPress={()=>handleConnectPress()}
             style={"primary"}
-            disabled={selectedDevice == null}
+            disabled={!(connectedDevice || selectedDevice)}
           />
-          {connectedBleDevice && (
+          {connectedDevice && (
             <OpacityButton 
               text="Open Threat Level Mapping Settings"
               onPress={()=>navigation.navigate("Settings")}
