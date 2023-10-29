@@ -1,7 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { Platform } from "react-native";
 import RNBluetoothClassic, { BluetoothDevice } from 'react-native-bluetooth-classic';
-import { DeviceContext } from "./DeviceContextProvider";
 import { BluetoothApi } from "./BluetoothApis";
 
 interface BluetoothClassicApi extends BluetoothApi {
@@ -13,7 +12,7 @@ interface BluetoothClassicApi extends BluetoothApi {
   requestBluetoothEnabled(): Promise<void>;
   openBluetoothSettings(): void;
   getPairedDevices(): Promise<void>;
-  writeToDevice(text: string): Promise<void>;
+  writeToDevice(device: BluetoothDevice, text: string): Promise<void>;
 };
 
 
@@ -133,10 +132,11 @@ function useBC(): BluetoothClassicApi {
   };
 
 
-  const writeToDevice = async (text: string): Promise<void> => {
+  const writeToDevice = async (device: BluetoothDevice, text: string): Promise<void> => {
     try {
-      console.log(text)
-      await RNBluetoothClassic.writeToDevice("98:D3:51:FD:A2:55", text);
+      const parsedText = text.toLowerCase().replaceAll(' ', '');
+      console.log("parsed text is ", parsedText);
+      await RNBluetoothClassic.writeToDevice(device.address, parsedText);
     } catch (err) {
       console.log(err)
     }

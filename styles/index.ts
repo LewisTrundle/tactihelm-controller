@@ -60,7 +60,7 @@ const homeStyles = StyleSheet.create({
   footerContainer: {
     backgroundColor: colors.white,
     height: 60,
-    width: metrics.fullWidth,
+    width: "100%",
     bottom: 30,
   },
   footerText: {
@@ -141,15 +141,15 @@ const buttonStyles = StyleSheet.create({
 
 const modalStyles = StyleSheet.create({
   container: {
+    flex: 1,
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.7)",
+  },
+  content: {
     backgroundColor: colors.white,
-    top: "40%",
     padding: 16,
     margin: 16,
     borderRadius: 14,
-  },
-  content: {
-    alignSelf: "center",
-    textAlign: "center"
   },
   titleText: {
     alignSelf: "center",
@@ -177,4 +177,21 @@ const modalStyles = StyleSheet.create({
   },
 });
 
-export { styles, homeStyles, deviceScreenStyles, buttonStyles, modalStyles }
+const debugStyles = StyleSheet.create({
+  container: {
+    flexDirection: "column",
+  },
+  sendTextContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  sendText: {
+    flex: 9,
+  },
+  sendButton: {
+    flex: 1
+    //backgroundColor: "green"
+  },
+})
+
+export { styles, homeStyles, deviceScreenStyles, buttonStyles, modalStyles, debugStyles }

@@ -7,11 +7,12 @@ type IconButtonProps = {
   onPress: any
   size?: number
   color?: string
+  style?: any
 }
 
-export const IconButton = ({iconName, onPress, size=100, color="red"}: IconButtonProps) => {
+export const IconButton = ({iconName, onPress, style, size=100, color="red"}: IconButtonProps) => {
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity onPress={onPress} style={style}>
       <Icon name={iconName} size={size} color={color} />
     </TouchableOpacity>
   )

@@ -1,6 +1,8 @@
-import { IconButton } from './IconButton';
-import { OpacityButton } from './OpacityButton';
-import { AlertModal } from './AlertModal';
-import { ItemList } from './ItemList';
+import { IconButton } from './atoms/IconButton';
+import { OpacityButton } from './atoms/OpacityButton';
+import { TactorSlider } from './atoms/TactorSlider';
+import { AlertModal } from './molecules/AlertModal';
+import { ItemList } from './molecules/ItemList';
+import { DebugModal } from './organisms/DebugModal';
 
-export { IconButton, OpacityButton, AlertModal, ItemList };
+export { IconButton, OpacityButton, TactorSlider, AlertModal, ItemList, DebugModal };

@@ -4,7 +4,7 @@ import { useBC, permissions } from '../hooks';
 import { AlertModal } from "../components";
 import { homeStyles } from "../styles";
 import { DeviceContext } from "../hooks/DeviceContextProvider";
-import { IconButton } from '../components/IconButton';
+import { IconButton } from '../components/atoms/IconButton';
 import { BluetoothTypes } from '../constants/BluetoothTypes';
 
 const HomeScreen = ({ navigation }) => {
@@ -30,7 +30,6 @@ const HomeScreen = ({ navigation }) => {
         title="Please enable Bluetooth to continue using the app."
         visible={!isBluetoothEnabled}
         onConfirm={() => requestBluetoothEnabled()}
-        allowClose={false}
         confirmText="Enable Bluetooth"
       >
       </AlertModal>
@@ -38,7 +37,6 @@ const HomeScreen = ({ navigation }) => {
         title="Please enable the necessary permissions to continue using the app."
         visible={!arePermissionsGranted}
         onConfirm={async () => await requestPermissions()}
-        allowClose={false}
         confirmText="Enable permissions"
       >
       </AlertModal>

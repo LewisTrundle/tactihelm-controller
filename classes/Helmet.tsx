@@ -1,0 +1,3 @@
+class Helmet extends BluetoothDevice {
+  
+}

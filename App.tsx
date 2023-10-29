@@ -1,7 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { HomeScreen, DeviceScreen, SettingsScreen } from './screens';
-import { IconButton } from './components/IconButton';
+import { IconButton } from './components/atoms/IconButton';
 import { DeviceContextProvider } from './hooks/DeviceContextProvider';
 import { BluetoothTypes } from './constants/BluetoothTypes';
 

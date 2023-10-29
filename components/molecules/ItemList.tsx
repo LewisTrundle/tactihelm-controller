@@ -1,5 +1,5 @@
 import { FlatList, TouchableWithoutFeedback } from "react-native";
-import { OpacityButton } from "./OpacityButton";
+import { OpacityButton } from "../atoms/OpacityButton";
 
 type ItemListProps = {
   items: any[]
