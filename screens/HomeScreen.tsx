@@ -1,26 +1,37 @@
 import { SafeAreaView, StatusBar, Text, View } from "react-native";
-import { useEffect, useContext } from "react";
-import { useBC, permissions } from '../hooks';
+import { useEffect } from "react";
+import { useBC, permissions, monitorSensor } from '../hooks';
 import { AlertModal } from "../components";
 import { homeStyles } from "../styles";
-import { DeviceContext } from "../hooks/DeviceContextProvider";
 import { IconButton } from '../components/atoms/IconButton';
-import { BluetoothTypes } from '../constants/BluetoothTypes';
+import { BluetoothTypes } from '../constants';
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ navigation, GlobalState }) => {
   const { isBluetoothEnabled, bluetoothIsEnabled, requestBluetoothEnabled } = useBC();
   const { arePermissionsGranted, requestPermissions, checkPermissions } = permissions();
-  const { connectedBLEDevice, connectedBCDevice } = useContext(DeviceContext);
+  const { startStreamingData, threats } = monitorSensor();
+
+  const { sensor, setSensor, helmet, setHelmet } = GlobalState;
 
   useEffect(() => {
     bluetoothIsEnabled();
     checkPermissions();
     navigation.addListener('focus', payload => {
+      sensor.bluetootDevice && startStreamingData(sensor.bluetoothDevice);
+
     });
     return () => {
       navigation.removeListener('focus');
     }
   }, []);
+
+  useEffect(() => {
+    console.log(threats)
+  }, [threats])
+
+  useEffect(() => {
+    //console.log("connected sensor is ", sensor)
+  }, [GlobalState])
 
 
   return (
@@ -44,8 +55,8 @@ const HomeScreen = ({ navigation }) => {
         <IconButton iconName="basketball" onPress={()=>navigation.navigate("Device", {conn: BluetoothTypes.BC})} size={50} color="white" />
       </View>
       <View style={homeStyles.footerContainer}>
-        <Text style={homeStyles.footerText}>Connect to bike radar: {connectedBLEDevice?.name}</Text>
-        <Text style={homeStyles.footerText}>Connect to helmet: {connectedBCDevice?.name}</Text>
+        <Text style={homeStyles.footerText}>Connect to bike radar: {sensor?.name}</Text>
+        <Text style={homeStyles.footerText}>Connect to helmet: {helmet?.name}</Text>
       </View>
     </SafeAreaView>
   );

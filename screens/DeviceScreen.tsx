@@ -3,12 +3,14 @@ import { useEffect, useState, useContext } from "react";
 import { useBLE, useBC, permissions, Device, BluetoothDevice } from "../hooks";
 import { OpacityButton, ItemList } from "../components";
 import { deviceScreenStyles } from "../styles";
-import { BluetoothTypes } from "../constants/BluetoothTypes";
+import { BluetoothTypes } from "../constants";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { DeviceContext } from '../hooks/DeviceContextProvider';
 
+import { Sensor, Helmet } from '../classes';
 
-const DeviceScreen = ({ navigation, route }) => {
+
+const DeviceScreen = ({ navigation, route, GlobalState }) => {
   const { conn } = route.params;
   const isBLE = conn === BluetoothTypes.BLE; 
 
@@ -17,6 +19,8 @@ const DeviceScreen = ({ navigation, route }) => {
   const [connectedDevice, setConnectedDevice] = useState(connectedBCDevice || connectedBLEDevice);
   const { requestPermissions } = permissions();
   const [selectedDevice, setSelectedDevice] = useState<null | Device | BluetoothDevice>(null);
+
+  const { sensor, setSensor, helmet, setHelmet } = GlobalState;
 
 
   const scanForDevices = async () => {
@@ -43,6 +47,7 @@ const DeviceScreen = ({ navigation, route }) => {
       console.log("ATTEMPTING CONNECT TO ", selectedDevice?.name);
       await connectToDevice(selectedDevice);
       isBLE ? setConnectedDevices(selectedDevice, connectedBCDevice) : setConnectedDevices(connectedBLEDevice, selectedDevice);
+      isBLE && setSensor(new Sensor(selectedDevice))
     }
   };
 
@@ -71,7 +76,7 @@ const DeviceScreen = ({ navigation, route }) => {
               <Icon name={"bluetooth"} size={100} color={"white"} />
             </View>
             <Text style={deviceScreenStyles.deviceInfoText}>Name: {connectedDevice.name}</Text>
-            <Text style={deviceScreenStyles.deviceInfoText}>ID: {connectedDevice.id}</Text>
+            <Text style={deviceScreenStyles.deviceInfoText}>Address: {connectedDevice.address}</Text>
           </View>
         ) : (
           <View style={deviceScreenStyles.devicesContainer}>
