@@ -1,30 +1,31 @@
 import { SafeAreaView, StatusBar, Linking } from "react-native";
 import { useState } from "react";
-import { OpacityButton, DebugModal } from "../components";
-import { useEffect } from "react";
-import { useBC } from '../hooks';
+import { OpacityButton, DebugHelmetModal, DebugSensorModal } from "../components";
+import { useBC } from '../utils';
 import { styles } from "../styles";
 
 
-const SetingsScreen = ({ GlobalState }) => {
-  const { openBluetoothSettings, writeToDevice } = useBC();
-  const [isDebugModalOpen, setIsDebugModalOpen] = useState<boolean>(false);
+const SetingsScreen = () => {
+  const { openBluetoothSettings, writeToDevice, connectedDevice: bcConnectedDevice } = useBC();
+  const [isDebugSensorModalOpen, setIsDebugSensorModalOpen] = useState<boolean>(false);
+  const [isDebugHelmetModalOpen, setIsDebugHelmetModalOpen] = useState<boolean>(false);
 
-  const { sensor, setSensor, helmet, setHelmet } = GlobalState;
-
-  useEffect(() => {
-
-  }, [])
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar />
-      <DebugModal
-        title="Debug Mode"
-        visible={isDebugModalOpen}
-        onClose={() => setIsDebugModalOpen(false)}
+      <DebugSensorModal
+        title="Debug Sensor"
+        visible={isDebugSensorModalOpen}
+        onClose={() => setIsDebugSensorModalOpen(false)}
+      />
+      <DebugHelmetModal
+        title="Debug Helmet"
+        visible={isDebugHelmetModalOpen}
+        onClose={() => setIsDebugHelmetModalOpen(false)}
         confirmText="Enable Bluetooth"
         sendData={writeToDevice}
+        device={bcConnectedDevice}
       />
       <OpacityButton 
         text="Open permissions"
@@ -37,8 +38,13 @@ const SetingsScreen = ({ GlobalState }) => {
         style={"primary"}
       />
       <OpacityButton 
-        text="Debug Mode"
-        onPress={()=> setIsDebugModalOpen(true)}
+        text="Debug Sensor"
+        onPress={()=> setIsDebugSensorModalOpen(true)}
+        style={"primary"}
+      />
+      <OpacityButton 
+        text="Debug Helmet"
+        onPress={()=> setIsDebugHelmetModalOpen(true)}
         style={"primary"}
       />
     </SafeAreaView>

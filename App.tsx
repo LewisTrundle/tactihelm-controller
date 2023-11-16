@@ -2,19 +2,20 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { HomeScreen, DeviceScreen, SettingsScreen } from './screens';
 import { IconButton } from './components/atoms/IconButton';
-import { DeviceContextProvider } from './hooks/DeviceContextProvider';
-import { BluetoothTypes } from './constants/BluetoothTypes';
+import { BluetoothTypes } from './constants';
+import { BLEProvider, BCProvider } from './utils';
 
-const Stack = createNativeStackNavigator();
 
 function App() {
+  const Stack = createNativeStackNavigator();
 
   return (
-    <DeviceContextProvider>
+    <BLEProvider>
+    <BCProvider>
     <NavigationContainer>
       <Stack.Navigator initialRouteName='Home'>
         <Stack.Screen 
-          name="Home" 
+          name="Home"
           component={HomeScreen}
           options={({ navigation }) => ({
             title: "Tactihelm",
@@ -28,8 +29,10 @@ function App() {
 
           })}
         />
+
+
         <Stack.Screen 
-          name="Device" 
+          name="Device"
           component={DeviceScreen}
           options={({ navigation }) => ({
             title: "Connect to Bluetooth Device",
@@ -39,17 +42,20 @@ function App() {
             headerTitleAlign: 'center'
           })}
         />
+
         <Stack.Screen 
-          name="Settings" 
+          name="Settings"
           component={SettingsScreen}
           options={({ navigation }) => ({
             title: "Settings",
             headerTitleAlign: 'center'
           })}
         />
+
       </Stack.Navigator>
     </NavigationContainer>
-    </DeviceContextProvider>
+    </BCProvider>
+    </BLEProvider>
   );
 }
 

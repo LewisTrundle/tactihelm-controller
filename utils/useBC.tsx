@@ -1,34 +1,59 @@
-import { useState, useEffect, useContext } from "react";
+import { createContext, useContext, useState } from "react";
 import { Platform } from "react-native";
 import RNBluetoothClassic, { BluetoothDevice } from 'react-native-bluetooth-classic';
-import { BluetoothApi } from "./BluetoothApis";
 
-interface BluetoothClassicApi extends BluetoothApi {
-  isBluetoothSupported: boolean;
-  isBluetoothEnabled: boolean;
-  pairedDevices: BluetoothDevice[];
+interface BluetoothClassicApi {
+  startScan(): Promise<void>;
+  stopScan(): Promise<void>;
+  connectToDevice: (device: BluetoothDevice) => Promise<void>;
+  disconnectFromDevice: () => Promise<void>;
+  handleItemPress: (device: BluetoothDevice) => void;
+  handleConnectPress: () => Promise<void>;
   deviceSupportsBluetooth(): Promise<void>;
   bluetoothIsEnabled(): Promise<void>;
   requestBluetoothEnabled(): Promise<void>;
   openBluetoothSettings(): void;
   getPairedDevices(): Promise<void>;
-  writeToDevice(device: BluetoothDevice, text: string): Promise<void>;
+  writeToDevice(text: string): Promise<void>;
+  deviceList: BluetoothDevice[];
+  connectedDevice: BluetoothDevice | null;
+  selectedDevice: BluetoothDevice | null;
+  isBluetoothSupported: boolean;
+  isBluetoothEnabled: boolean;
+  pairedDevices: BluetoothDevice[];
 };
 
+const defaultContext: BluetoothClassicApi = {
+  startScan: null,
+  stopScan: null,
+  connectToDevice: null,
+  disconnectFromDevice: null,
+  handleItemPress: null,
+  handleConnectPress: null,
+  deviceSupportsBluetooth: null,
+  bluetoothIsEnabled: null,
+  requestBluetoothEnabled: null,
+  openBluetoothSettings: null,
+  getPairedDevices: null,
+  writeToDevice: null,
+  deviceList: null,
+  connectedDevice: null,
+  selectedDevice: null,
+  isBluetoothSupported: null,
+  isBluetoothEnabled: null,
+  pairedDevices: null,
+};
 
-function useBC(): BluetoothClassicApi {
+const BCContext = createContext(defaultContext);
+
+
+export const BCProvider = ({ children }) => {
   const [deviceList, setDeviceList] = useState<BluetoothDevice[]>([]);
+  const [connectedDevice, setConnectedDevice] = useState<BluetoothDevice | null>(null);
+  const [selectedDevice, setSelectedDevice] = useState<BluetoothDevice | null>(null);
   const [isBluetoothSupported, setIsBluetoothSupported] = useState<boolean>(false);
   const [isBluetoothEnabled, setIsBluetoothEnabled] = useState<boolean>(false);
   const [pairedDevices, setPairedDevices] = useState<BluetoothDevice[]>([]);
-
-
-  useEffect(() => {
-    const bluetoothListener = RNBluetoothClassic.onStateChanged((event) => setIsBluetoothEnabled(event.enabled));
-    return () => {
-      bluetoothListener.remove();
-    };
-  }, []);
 
   const startScan = async (): Promise<void> => {
     if (Platform.OS === 'android') {
@@ -64,15 +89,17 @@ function useBC(): BluetoothClassicApi {
   const connectToDevice = async (device: BluetoothDevice): Promise<void> => {
     try {
       const isConnected = await device.connect();
+      setConnectedDevice(device);
       console.log("device has been connected: ", isConnected)
     } catch (err) {
       console.log("FAILED TO CONNECT TO DEVICE", device?.name, JSON.stringify(err));
     }
   }
 
-  const disconnectFromDevice = async (device: BluetoothDevice): Promise<void> => {
+  const disconnectFromDevice = async (): Promise<void> => {
     try {
-      const disconnected = await device.disconnect();
+      const disconnected = await connectedDevice.disconnect();
+      setConnectedDevice(null);
       console.log("device has been disconnected: " + disconnected)
     } catch (err) {
       console.log("FAILED TO DISCONNECT", JSON.stringify(err));
@@ -132,32 +159,52 @@ function useBC(): BluetoothClassicApi {
   };
 
 
-  const writeToDevice = async (device: BluetoothDevice, text: string): Promise<void> => {
+  const writeToDevice = async (text: string): Promise<void> => {
     try {
       const parsedText = text.toLowerCase().replaceAll(' ', '');
       console.log("parsed text is ", parsedText);
-      await RNBluetoothClassic.writeToDevice(device.address, parsedText);
+      await RNBluetoothClassic.writeToDevice(connectedDevice.address, parsedText);
     } catch (err) {
       console.log(err)
     }
-  }
-
-  return {
-    deviceSupportsBluetooth,
-    bluetoothIsEnabled,
-    requestBluetoothEnabled,
-    openBluetoothSettings,
-    getPairedDevices,
-    startScan,
-    stopScan,
-    connectToDevice,
-    disconnectFromDevice,
-    writeToDevice,
-    deviceList,
-    isBluetoothSupported,
-    isBluetoothEnabled,
-    pairedDevices,
   };
-}
 
-export { useBC, BluetoothDevice };
+
+  const handleItemPress = (device: (BluetoothDevice | null)): void => {
+    if (selectedDevice === device) {
+      setSelectedDevice(null);
+    } else {
+      setSelectedDevice(device);
+    }
+  };
+
+  const handleConnectPress = async (): Promise<void> => {
+    if (connectedDevice) {
+      await disconnectFromDevice();
+    } else {
+      await connectToDevice(selectedDevice);
+    }
+  };
+
+  const bcApi: BluetoothClassicApi = { startScan, stopScan, connectToDevice, 
+    disconnectFromDevice, handleItemPress, handleConnectPress, deviceSupportsBluetooth, 
+    bluetoothIsEnabled, requestBluetoothEnabled, openBluetoothSettings, getPairedDevices, 
+    writeToDevice, deviceList, connectedDevice, selectedDevice, isBluetoothSupported, 
+    isBluetoothEnabled, pairedDevices };
+
+
+  return (
+    <BCContext.Provider value={bcApi}>
+      {children}
+    </BCContext.Provider>
+  );
+};
+
+
+export const useBC = () => {
+  const helmet = useContext(BCContext);
+  if (!helmet) {
+    throw new Error('sensor must be used within a BLEProvider');
+  }
+  return helmet;
+};

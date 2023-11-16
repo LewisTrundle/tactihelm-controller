@@ -1,26 +1,26 @@
 import { View } from 'react-native';
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { debugStyles }  from '../../styles';
-import { AlertModal, IconButton } from "../index";
 import { Input } from 'react-native-elements';
-import { DeviceContext } from "../../hooks/DeviceContextProvider";
+import { AlertModal } from "../molecules/AlertModal";
+import { IconButton } from "../atoms/IconButton";
 import { TactorSlider } from '../atoms/TactorSlider';
 
-type DebugModalProps = {
+type DebugHelmetModalProps = {
   title?: string
   children?: any
   visible?: boolean
   onClose?: () => void
   confirmText?: string
   sendData?: any
+  device?: any
 };
 
-export const DebugModal = ({title, visible, onClose, confirmText, sendData}: DebugModalProps) => {
+export const DebugHelmetModal = ({title, visible, onClose, confirmText, sendData, device}: DebugHelmetModalProps) => {
   const [textValue, setTextValue] = useState('');
-  const { connectedBCDevice } = useContext(DeviceContext);
 
   const sendCommand = async (value: String) => {
-    await sendData(connectedBCDevice, value);
+    await sendData(device.bluetoothDevice, value);
   }
 
   return (

@@ -14,7 +14,7 @@ interface PermissionsApi {
   arePermissionsGranted: boolean
 }
 
-function permissions(): PermissionsApi {
+function usePermissions(): PermissionsApi {
   const [arePermissionsGranted, setArePermissionsGranted] = useState(false);
 
   const scanPermission: PermissionProps = {
@@ -105,4 +105,4 @@ function permissions(): PermissionsApi {
   }
 };
 
-export default permissions;
+export default usePermissions;
