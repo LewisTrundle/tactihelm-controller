@@ -32,6 +32,7 @@
     "react-native-screens": "~3.22.0",
     "react-native-use-modal": "^1.0.2",
     "react-native-vector-icons": "^10.0.0",
+    "toggle-switch-react-native": "^3.3.0",
     "with-rn-bluetooth-classic": "^1.0.5"
   },
   "devDependencies": {
