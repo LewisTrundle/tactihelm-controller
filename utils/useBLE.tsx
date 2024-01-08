@@ -15,7 +15,7 @@ interface BluetoothLowEnergyApi {
   deviceList: Device[];
   connectedDevice: Device | null;
   selectedDevice: Device | null;
-  threats: any;
+  threat: any;
 };
 
 const defaultContext: BluetoothLowEnergyApi = {
@@ -29,7 +29,7 @@ const defaultContext: BluetoothLowEnergyApi = {
   deviceList: null,
   connectedDevice: null,
   selectedDevice: null,
-  threats: null,
+  threat: null,
 };
 
 const BLEContext = createContext(defaultContext);
@@ -40,7 +40,7 @@ export const BLEProvider = ({ children }) => {
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [services, setServices] = useState<Record<string, any>>(null);
-  const [threats, setThreats] = useState([]);
+  const [threat, setThreat] = useState(null);
 
 
   const isDuplicateDevice = (devices: Device[], nextDevice: Device) =>
@@ -120,27 +120,27 @@ export const BLEProvider = ({ children }) => {
   };
 
   
-  const updateThreats = (newThreat: Threat) => {
-    setThreats((prevData) => {
-      const existingObjectIndex = prevData.findIndex(obj => obj.id === newThreat.id);
+  // const updateThreats = (newThreat: Threat) => {
+  //   setThreats((prevData) => {
+  //     const existingObjectIndex = prevData.findIndex(obj => obj.id === newThreat.id);
 
-      if (existingObjectIndex !== -1) {
-        const preData = [...prevData];
-        if (newThreat.distance <= 5) {
-          preData.splice(existingObjectIndex, 1);     // remove threat
-        } else {
-          preData[existingObjectIndex] = newThreat;   // update threat
-        }
-        return preData;
-      } else {
-        if (newThreat.distance <= 5) {
-          return [...prevData]
-        } else {
-          return [...prevData, newThreat];
-        }
-      }
-    });
-  };
+  //     if (existingObjectIndex !== -1) {
+  //       const preData = [...prevData];
+  //       if (newThreat.distance <= 5) {
+  //         preData.splice(existingObjectIndex, 1);     // remove threat
+  //       } else {
+  //         preData[existingObjectIndex] = newThreat;   // update threat
+  //       }
+  //       return preData;
+  //     } else {
+  //       if (newThreat.distance <= 5) {
+  //         return [...prevData]
+  //       } else {
+  //         return [...prevData, newThreat];
+  //       }
+  //     }
+  //   });
+  // };
 
 
   const onSensorUpdate = (error: BleError | null, characteristic: Characteristic | null) => {
@@ -153,21 +153,21 @@ export const BLEProvider = ({ children }) => {
     }
 
     const binaryData = Buffer.from(characteristic.value, "base64");
+    let threats: Threat[] = [];
     for (let i = 1; i < binaryData.length; i+=3) {
       let id = binaryData[i];
       let distance = binaryData[i+1];
       let speed = binaryData[i+2];
-      //console.log(id, distance, speed)
-      const threat = new Threat(id, distance, speed);
-      updateThreats(threat);
-      if (distance <= 3) {
-        //delete this.threats[threat.id];
+      threats.push(new Threat(id, distance, speed));
+    };
+    const t: Threat = threats.reduce((nearest, current) => {
+      if (!nearest || current.distance < nearest.distance) {
+        return current;
       } else {
-        //this.threats[threat.id] = threat;
+        return nearest;
       }
-      //console.log(this.threats);
-      //console.log("id: ",id + "\tdistance: "+distance + "\tspeed: "+speed)
-    }
+    }, null);
+    setThreat(t)
   };
 
 
@@ -253,7 +253,7 @@ export const BLEProvider = ({ children }) => {
 
   const bleApi: BluetoothLowEnergyApi = { startScan, stopScan, connectToDevice, 
     disconnectFromDevice, handleItemPress, handleConnectPress, getCharacteristicData,
-    deviceList, connectedDevice, selectedDevice, threats };
+    deviceList, connectedDevice, selectedDevice, threat };
 
 
   return (

@@ -1,14 +1,13 @@
 import { SafeAreaView, StatusBar, Text, View } from "react-native";
 import { useEffect } from "react";
 import { useBLE, useBC, usePermissions } from '../utils';
-import { AlertModal } from "../components";
+import { AlertModal, OpacityButton } from "../components";
 import { homeStyles } from "../styles";
-import { IconButton } from '../components/atoms/IconButton';
 import { BluetoothTypes } from "../constants";
 
 
 const HomeScreen = ({ navigation }) => {
-  const { connectedDevice: bleConnectedDevice, getCharacteristicData, threats } = useBLE();
+  const { connectedDevice: bleConnectedDevice, getCharacteristicData, threat } = useBLE();
   const { connectedDevice: bcConnectedDevice, isBluetoothEnabled, bluetoothIsEnabled, requestBluetoothEnabled } = useBC();
   const { arePermissionsGranted, requestPermissions, checkPermissions } = usePermissions();
 
@@ -25,8 +24,8 @@ const HomeScreen = ({ navigation }) => {
   }, [bleConnectedDevice, bcConnectedDevice]);
 
   useEffect(() => {
-    console.log(threats)
-  }, [threats])
+    console.log(threat)
+  }, [threat])
 
 
 
@@ -48,7 +47,16 @@ const HomeScreen = ({ navigation }) => {
       >
       </AlertModal>
       <View style={homeStyles.contentContainer}>
-        <IconButton iconName="basketball" onPress={()=>navigation.navigate("Device", {conn: BluetoothTypes.BC})} size={50} color="white" />
+        <OpacityButton 
+          text="Connect to Sensor"
+          onPress={() => navigation.navigate("Device", {conn: BluetoothTypes.BLE})}
+          style={"secondary"}
+        />
+        <OpacityButton 
+          text="Connect to Helmet"
+          onPress={() => navigation.navigate("Device", {conn: BluetoothTypes.BC})}
+          style={"secondary"}
+        />
       </View>
       <View style={homeStyles.footerContainer}>
         <Text style={homeStyles.footerText}>Connect to bike radar: {bleConnectedDevice?.name}</Text>

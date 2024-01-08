@@ -9,9 +9,11 @@ type OpacityButtonProps = {
   disabled?: boolean
 }
 
+type ButtonTextStyles = keyof typeof buttonStyles; //buttonStyles.primaryButtonText | buttonStyles.secondaryButtonText;
+
 export const OpacityButton = ({ text, onPress, style, disabled=false}: OpacityButtonProps) => {
   const [buttonStyle, setButtonStyle] = useState(buttonStyles.primaryButton);
-  const [buttonTextStyle, setButtonTextStyle] = useState(buttonStyles.primaryButtonText);
+  const [buttonTextStyle, setButtonTextStyle] = useState<ButtonTextStyles>(buttonStyles.primaryButtonText);
   const [buttonDisabledStyle, setButtonDisabledStyle] = useState(buttonStyles.buttonDisabled);
   
   const setStyles = () => {

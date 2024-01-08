@@ -22,9 +22,6 @@ function App() {
             headerRight: () => (
               <IconButton iconName="settings-outline" onPress={()=>navigation.navigate("Settings")} size={30} color="black" />
             ),
-            headerLeft: () => (
-              <IconButton iconName="bluetooth" onPress={()=>navigation.navigate("Device", {conn: BluetoothTypes.BLE})} size={30} color="black" />
-            ),
             headerTitleAlign: 'center',
 
           })}
