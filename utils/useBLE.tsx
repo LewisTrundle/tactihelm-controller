@@ -9,12 +9,10 @@ interface BluetoothLowEnergyApi {
   stopScan(): void;
   connectToDevice: (device: Device) => Promise<void>;
   disconnectFromDevice: (device: Device) => Promise<void>;
-  handleItemPress: (device: Device) => void;
-  handleConnectPress: () => Promise<void>;
+  handleConnectPress: (device: Device) => Promise<void>;
   getCharacteristicData: (func: string) => Promise<string | number | null>;
   deviceList: Device[];
   connectedDevice: Device | null;
-  selectedDevice: Device | null;
   threat: any;
 };
 
@@ -23,12 +21,10 @@ const defaultContext: BluetoothLowEnergyApi = {
   stopScan: null,
   connectToDevice: null,
   disconnectFromDevice: null,
-  handleItemPress: null,
   handleConnectPress: null,
   getCharacteristicData: null,
   deviceList: null,
   connectedDevice: null,
-  selectedDevice: null,
   threat: null,
 };
 
@@ -38,7 +34,6 @@ export const BLEProvider = ({ children }) => {
   const bleManager = useMemo(() => new BleManager(), []);
   const [deviceList, setDeviceList] = useState<Device[]>([]);
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
-  const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [services, setServices] = useState<Record<string, any>>(null);
   const [threat, setThreat] = useState(null);
 
@@ -234,26 +229,17 @@ export const BLEProvider = ({ children }) => {
   };
 
 
-  const handleItemPress = (device: (Device | null)): void => {
-    if (selectedDevice === device) {
-      setSelectedDevice(null);
-    } else {
-      setSelectedDevice(device);
-    }
-  };
-
-
-  const handleConnectPress = async (): Promise<void> => {
+  const handleConnectPress = async (device: Device): Promise<void> => {
     if (connectedDevice) {
       await disconnectFromDevice();
     } else {
-      await connectToDevice(selectedDevice);
+      await connectToDevice(device);
     }
   };
 
   const bleApi: BluetoothLowEnergyApi = { startScan, stopScan, connectToDevice, 
-    disconnectFromDevice, handleItemPress, handleConnectPress, getCharacteristicData,
-    deviceList, connectedDevice, selectedDevice, threat };
+    disconnectFromDevice, handleConnectPress, getCharacteristicData,
+    deviceList, connectedDevice, threat };
 
 
   return (

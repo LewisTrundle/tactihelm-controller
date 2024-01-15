@@ -7,11 +7,12 @@ type OpacityButtonProps = {
   onPress?: () => (void | Promise<void>)
   style?: string 
   disabled?: boolean
+  looksDisabled?: boolean
 }
 
 type ButtonTextStyles = keyof typeof buttonStyles; //buttonStyles.primaryButtonText | buttonStyles.secondaryButtonText;
 
-export const OpacityButton = ({ text, onPress, style, disabled=false}: OpacityButtonProps) => {
+export const OpacityButton = ({ text, onPress, style, disabled=false, looksDisabled=false}: OpacityButtonProps) => {
   const [buttonStyle, setButtonStyle] = useState(buttonStyles.primaryButton);
   const [buttonTextStyle, setButtonTextStyle] = useState<ButtonTextStyles>(buttonStyles.primaryButtonText);
   const [buttonDisabledStyle, setButtonDisabledStyle] = useState(buttonStyles.buttonDisabled);
@@ -28,6 +29,11 @@ export const OpacityButton = ({ text, onPress, style, disabled=false}: OpacityBu
         setButtonTextStyle(buttonStyles.secondaryButtonText);
         break;
       }
+      case "tertiary": {
+        setButtonStyle(buttonStyles.tertiaryButton);
+        setButtonTextStyle(buttonStyles.tertiaryButtonText);
+        break;
+      }
     }
   };
 
@@ -36,7 +42,7 @@ export const OpacityButton = ({ text, onPress, style, disabled=false}: OpacityBu
   }, [])
 
   return (
-    <TouchableOpacity onPress={onPress} style={[buttonStyle, disabled && buttonDisabledStyle]} disabled={disabled}>
+    <TouchableOpacity onPress={onPress} style={[buttonStyle, (disabled || looksDisabled) && buttonDisabledStyle]} disabled={disabled}>
       <Text style={buttonTextStyle}>{text}</Text>
     </TouchableOpacity>
   )

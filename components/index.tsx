@@ -1,7 +1,8 @@
 import { IconButton } from './atoms/IconButton';
 import { OpacityButton } from './atoms/OpacityButton';
-import { TactorSlider } from './atoms/TactorSlider';
+import { CustomSlider } from './atoms/CustomSlider';
 import { CustomToggleSwitch } from './atoms/CustomToggleSwitch';
+import { CustomSelectDropdown } from './atoms/CustomSelectDropdown';
 import { AlertModal } from './molecules/AlertModal';
 import { ItemList } from './molecules/ItemList';
 import { DebugHelmetModal } from './organisms/DebugHelmetModal';
@@ -9,5 +10,5 @@ import { DebugSensorModal } from './organisms/DebugSensorModal';
 import { DeviceInfoScreen } from './organisms/DeviceInfoScreen';
 import { ThreatList } from './organisms/ThreatList';
 
-export { IconButton, OpacityButton, TactorSlider, CustomToggleSwitch, AlertModal, ItemList, 
+export { IconButton, OpacityButton, CustomSlider, CustomToggleSwitch, CustomSelectDropdown, AlertModal, ItemList, 
   DebugHelmetModal, DebugSensorModal, DeviceInfoScreen, ThreatList };

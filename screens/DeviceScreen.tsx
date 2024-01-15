@@ -1,14 +1,14 @@
 import { useEffect } from "react";
-import { useBLE, useBC, usePermissions } from "../utils";
+import { useBLE, useBC, usePermissions, useSelectedItem } from "../utils";
 import { DeviceInfoScreen } from "../components";
 import { BluetoothTypes } from "../constants";
 
 const DeviceScreen = ({ navigation, route }) => {
   const isBLE = route.params.conn === BluetoothTypes.BLE;
 
-  const { startScan, stopScan, handleItemPress, handleConnectPress, 
-    deviceList, connectedDevice, selectedDevice } = isBLE ? useBLE() : useBC();
+  const { startScan, stopScan, handleConnectPress, deviceList, connectedDevice } = isBLE ? useBLE() : useBC();
   const { requestPermissions } = usePermissions();
+  const { handleItemPress, selectedItem } = useSelectedItem();
 
   const scanForDevices = async () => {
     const isPermissionsEnabled = await requestPermissions();
@@ -28,7 +28,7 @@ const DeviceScreen = ({ navigation, route }) => {
   return (
     <DeviceInfoScreen 
       connectedDevice={connectedDevice}
-      selectedDevice={selectedDevice}
+      selectedDevice={selectedItem}
       deviceList={deviceList}
       handleItemPress={handleItemPress}
       handleConnectPress={handleConnectPress}

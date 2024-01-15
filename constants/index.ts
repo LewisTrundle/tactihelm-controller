@@ -1,5 +1,19 @@
 import { BluetoothTypes } from "./BluetoothTypes";
-import { ThreatLevels } from "./ThreatLevels";
 import { GattServices, GattCharacteristics, GattFunction } from "./GattUUIDs";
+import { Command, CommandStrings } from "./Commands";
+import { Scheme, SchemeStrings } from "./Schemes";
+import { Tactor, TactorStrings } from "./Tactors";
+import { Distance, DistanceStrings } from "./Distances";
+import { Scenario, ScenarioStrings } from "./Scenarios";
+import { enumToArray } from "./enumHelpers";
 
-export { BluetoothTypes, ThreatLevels, GattServices, GattCharacteristics, GattFunction };
+export { 
+  BluetoothTypes, 
+  GattServices, GattCharacteristics, GattFunction,
+  Command, CommandStrings, 
+  Scheme, SchemeStrings, 
+  Tactor, TactorStrings,
+  Distance, DistanceStrings,
+  Scenario, ScenarioStrings,
+  enumToArray
+};

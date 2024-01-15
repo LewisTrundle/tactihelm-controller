@@ -1,25 +1,36 @@
 import { useState } from "react";
+import { View } from "react-native";
 import ToggleSwitch from 'toggle-switch-react-native';
 
+type Size = "small" | "medium" | "large";
+
 type CustomToggleSwitchProps = {
-  switchID?: number
-  onSlidingComplete?: (value: String) => Promise<void>
+  label?: string;
+  size?: Size;
+  onToggle?: any;
+  containerStyle?: any;
+  labelStyle?: any;
 }
 
-export const CustomToggleSwitch = ({ switchID, onSlidingComplete }: CustomToggleSwitchProps) => {
+export const CustomToggleSwitch = ({ label, size, onToggle, containerStyle, labelStyle }: CustomToggleSwitchProps) => {
   const [isToggleOn, setIsToggleOn] = useState<boolean>(false);
   
   return (
-    <ToggleSwitch
-      isOn={isToggleOn}
-      onColor="green"
-      offColor="red"
-      label="Example label"
-      labelStyle={{ color: "black", fontWeight: "900" }}
-      size="medium"
-      onToggle={isOn => setIsToggleOn(isOn)}
-      disabled={false}
-      animationSpeed={200}
-    />
+    <View style={containerStyle}>
+      <ToggleSwitch
+        isOn={isToggleOn}
+        onColor="green"
+        offColor="red"
+        label={label}
+        labelStyle={labelStyle}
+        size={size}
+        onToggle={isOn => {
+          setIsToggleOn(isOn)
+          onToggle();
+        }}
+        disabled={false}
+        animationSpeed={200}
+      />
+    </View>
   )
 };

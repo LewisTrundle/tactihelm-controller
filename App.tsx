@@ -1,8 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { HomeScreen, DeviceScreen, SettingsScreen } from './screens';
+import { HomeScreen, DeviceScreen, SettingsScreen, LabStudyScreen } from './screens';
 import { IconButton } from './components/atoms/IconButton';
-import { BluetoothTypes } from './constants';
 import { BLEProvider, BCProvider } from './utils';
 
 
@@ -45,6 +44,15 @@ function App() {
           component={SettingsScreen}
           options={({ navigation }) => ({
             title: "Settings",
+            headerTitleAlign: 'center'
+          })}
+        />
+
+        <Stack.Screen 
+          name="LabStudy"
+          component={LabStudyScreen}
+          options={({ navigation }) => ({
+            title: "Lab Study",
             headerTitleAlign: 'center'
           })}
         />

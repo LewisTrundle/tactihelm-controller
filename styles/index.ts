@@ -137,6 +137,19 @@ const buttonStyles = StyleSheet.create({
     fontSize: 20,
     color: colors.white,
   },
+  tertiaryButton: {
+    backgroundColor: colors.orange,
+    justifyContent: "center",
+    alignItems: "center",
+    height: 40,
+    width: 100,
+    marginHorizontal: 10,
+    borderRadius: 10,
+  },
+  tertiaryButtonText: {
+    fontSize: 14,
+    color: colors.white,
+  },
 });
 
 const modalStyles = StyleSheet.create({
@@ -190,8 +203,55 @@ const debugStyles = StyleSheet.create({
   },
   sendButton: {
     flex: 1
-    //backgroundColor: "green"
   },
-})
+});
 
-export { styles, homeStyles, deviceScreenStyles, buttonStyles, modalStyles, debugStyles }
+
+const labStudyStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.grey,
+    padding: 5,
+  },
+  dropdownsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    padding: 10
+  },
+  dropdownButton: {
+    width: 170,
+    height: 50,
+    backgroundColor: colors.pink,
+    borderRadius: 10
+  },
+  listContainer: {
+    padding: 10,
+    alignItems: "center",
+    width: "100%",
+  },
+  text: {
+    color: colors.white,
+    alignSelf: "center",
+    fontSize: 16,
+  },
+  smallText: {
+    fontSize: 12,
+  },
+  valueText: {
+    color: colors.tomato,
+    alignSelf: "center",
+    fontSize: 20,
+    paddingBottom: 20
+  },
+  toggleSwitchContainer: {
+    paddingTop: 5,
+    alignItems: "center",
+    width: "100%",
+  },
+  toggleSwitchLabel: {
+    color: colors.white, 
+    fontSize: 14,
+  }
+});
+
+export { styles, homeStyles, deviceScreenStyles, buttonStyles, modalStyles, debugStyles, labStudyStyles }

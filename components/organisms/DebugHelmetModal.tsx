@@ -4,23 +4,22 @@ import { debugStyles }  from '../../styles';
 import { Input } from 'react-native-elements';
 import { AlertModal } from "../molecules/AlertModal";
 import { IconButton } from "../atoms/IconButton";
-import { TactorSlider } from '../atoms/TactorSlider';
+import { CustomSlider } from '../atoms/CustomSlider';
+import { useBC } from '../../utils';
 
 type DebugHelmetModalProps = {
   title?: string
   children?: any
   visible?: boolean
   onClose?: () => void
-  confirmText?: string
-  sendData?: any
-  device?: any
 };
 
-export const DebugHelmetModal = ({title, visible, onClose, confirmText, sendData, device}: DebugHelmetModalProps) => {
+export const DebugHelmetModal = ({title, visible, onClose}: DebugHelmetModalProps) => {
+  const { writeToDevice } = useBC();
   const [textValue, setTextValue] = useState('');
 
-  const sendCommand = async (value: String) => {
-    await sendData(device.bluetoothDevice, value);
+  const sendCommand = async (value: string) => {
+    await writeToDevice(value);
   }
 
   return (
@@ -28,13 +27,8 @@ export const DebugHelmetModal = ({title, visible, onClose, confirmText, sendData
       title={title}
       visible={visible}
       onClose={onClose}
-      confirmText={confirmText}
     >
       <View style={debugStyles.container}>
-        <TactorSlider tactorID={1} onSlidingComplete={sendCommand}/>
-        <TactorSlider tactorID={2} onSlidingComplete={sendCommand}/>
-        <TactorSlider tactorID={3} onSlidingComplete={sendCommand}/>
-        <TactorSlider tactorID={4} onSlidingComplete={sendCommand}/>
 
         <View style={debugStyles.sendTextContainer}>
           <View style={debugStyles.sendText}>

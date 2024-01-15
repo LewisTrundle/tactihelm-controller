@@ -36,6 +36,7 @@ export const DeviceInfoScreen = ({connectedDevice, selectedDevice, deviceList,
             )}
               <ItemList 
                 items={deviceList}
+                renderProperty={"name"}
                 style={"secondary"}
                 onPress={handleItemPress}
                 selectedItem={selectedDevice}
@@ -46,7 +47,7 @@ export const DeviceInfoScreen = ({connectedDevice, selectedDevice, deviceList,
         <View style={deviceScreenStyles.buttonsContainer}>
           <OpacityButton 
             text={`${connectedDevice ? 'Disconnect from' : 'Connect to'} ${selectedDevice ? selectedDevice.name : 'device'}`}
-            onPress={()=>handleConnectPress()}
+            onPress={()=>handleConnectPress(selectedDevice)}
             style={"primary"}
             disabled={!(connectedDevice || selectedDevice)}
           />

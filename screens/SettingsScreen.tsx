@@ -5,8 +5,8 @@ import { useBC } from '../utils';
 import { styles } from "../styles";
 
 
-const SetingsScreen = () => {
-  const { openBluetoothSettings, writeToDevice, connectedDevice: bcConnectedDevice } = useBC();
+const SetingsScreen = ({ navigation }) => {
+  const { openBluetoothSettings } = useBC();
   const [isDebugSensorModalOpen, setIsDebugSensorModalOpen] = useState<boolean>(false);
   const [isDebugHelmetModalOpen, setIsDebugHelmetModalOpen] = useState<boolean>(false);
 
@@ -23,9 +23,6 @@ const SetingsScreen = () => {
         title="Debug Helmet"
         visible={isDebugHelmetModalOpen}
         onClose={() => setIsDebugHelmetModalOpen(false)}
-        confirmText="Enable Bluetooth"
-        sendData={writeToDevice}
-        device={bcConnectedDevice}
       />
       <OpacityButton 
         text="Open permissions"
@@ -45,6 +42,11 @@ const SetingsScreen = () => {
       <OpacityButton 
         text="Debug Helmet"
         onPress={()=> setIsDebugHelmetModalOpen(true)}
+        style={"primary"}
+      />
+      <OpacityButton 
+        text="Lab Study"
+        onPress={()=> navigation.navigate("LabStudy")}
         style={"primary"}
       />
     </SafeAreaView>

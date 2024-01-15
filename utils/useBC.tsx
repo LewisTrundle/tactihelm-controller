@@ -7,8 +7,7 @@ interface BluetoothClassicApi {
   stopScan(): Promise<void>;
   connectToDevice: (device: BluetoothDevice) => Promise<void>;
   disconnectFromDevice: () => Promise<void>;
-  handleItemPress: (device: BluetoothDevice) => void;
-  handleConnectPress: () => Promise<void>;
+  handleConnectPress: (device: BluetoothDevice) => Promise<void>;
   deviceSupportsBluetooth(): Promise<void>;
   bluetoothIsEnabled(): Promise<void>;
   requestBluetoothEnabled(): Promise<void>;
@@ -17,7 +16,6 @@ interface BluetoothClassicApi {
   writeToDevice(text: string): Promise<void>;
   deviceList: BluetoothDevice[];
   connectedDevice: BluetoothDevice | null;
-  selectedDevice: BluetoothDevice | null;
   isBluetoothSupported: boolean;
   isBluetoothEnabled: boolean;
   pairedDevices: BluetoothDevice[];
@@ -28,7 +26,6 @@ const defaultContext: BluetoothClassicApi = {
   stopScan: null,
   connectToDevice: null,
   disconnectFromDevice: null,
-  handleItemPress: null,
   handleConnectPress: null,
   deviceSupportsBluetooth: null,
   bluetoothIsEnabled: null,
@@ -38,7 +35,6 @@ const defaultContext: BluetoothClassicApi = {
   writeToDevice: null,
   deviceList: null,
   connectedDevice: null,
-  selectedDevice: null,
   isBluetoothSupported: null,
   isBluetoothEnabled: null,
   pairedDevices: null,
@@ -50,7 +46,6 @@ const BCContext = createContext(defaultContext);
 export const BCProvider = ({ children }) => {
   const [deviceList, setDeviceList] = useState<BluetoothDevice[]>([]);
   const [connectedDevice, setConnectedDevice] = useState<BluetoothDevice | null>(null);
-  const [selectedDevice, setSelectedDevice] = useState<BluetoothDevice | null>(null);
   const [isBluetoothSupported, setIsBluetoothSupported] = useState<boolean>(false);
   const [isBluetoothEnabled, setIsBluetoothEnabled] = useState<boolean>(false);
   const [pairedDevices, setPairedDevices] = useState<BluetoothDevice[]>([]);
@@ -161,7 +156,7 @@ export const BCProvider = ({ children }) => {
 
   const writeToDevice = async (text: string): Promise<void> => {
     try {
-      const parsedText = text.toLowerCase().replaceAll(' ', '');
+      const parsedText = text.toUpperCase().replaceAll(' ', '');
       console.log("parsed text is ", parsedText);
       await RNBluetoothClassic.writeToDevice(connectedDevice.address, parsedText);
     } catch (err) {
@@ -169,27 +164,18 @@ export const BCProvider = ({ children }) => {
     }
   };
 
-
-  const handleItemPress = (device: (BluetoothDevice | null)): void => {
-    if (selectedDevice === device) {
-      setSelectedDevice(null);
-    } else {
-      setSelectedDevice(device);
-    }
-  };
-
-  const handleConnectPress = async (): Promise<void> => {
+  const handleConnectPress = async (device: BluetoothDevice): Promise<void> => {
     if (connectedDevice) {
       await disconnectFromDevice();
     } else {
-      await connectToDevice(selectedDevice);
+      await connectToDevice(device);
     }
   };
 
   const bcApi: BluetoothClassicApi = { startScan, stopScan, connectToDevice, 
-    disconnectFromDevice, handleItemPress, handleConnectPress, deviceSupportsBluetooth, 
+    disconnectFromDevice, handleConnectPress, deviceSupportsBluetooth, 
     bluetoothIsEnabled, requestBluetoothEnabled, openBluetoothSettings, getPairedDevices, 
-    writeToDevice, deviceList, connectedDevice, selectedDevice, isBluetoothSupported, 
+    writeToDevice, deviceList, connectedDevice, isBluetoothSupported, 
     isBluetoothEnabled, pairedDevices };
 
 
