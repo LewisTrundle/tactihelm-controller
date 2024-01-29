@@ -9,6 +9,7 @@ import { DebugHelmetModal } from './organisms/DebugHelmetModal';
 import { DebugSensorModal } from './organisms/DebugSensorModal';
 import { DeviceInfoScreen } from './organisms/DeviceInfoScreen';
 import { ThreatList } from './organisms/ThreatList';
+import { AttributeSlider } from './organisms/AttributeSlider';
 
 export { IconButton, OpacityButton, CustomSlider, CustomToggleSwitch, CustomSelectDropdown, AlertModal, ItemList, 
-  DebugHelmetModal, DebugSensorModal, DeviceInfoScreen, ThreatList };
+  DebugHelmetModal, DebugSensorModal, DeviceInfoScreen, ThreatList, AttributeSlider };

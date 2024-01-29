@@ -1,5 +1,5 @@
-import { createContext, useContext, useMemo, useState } from 'react';
-import { BleManager, Device, BleError, Characteristic } from "react-native-ble-plx";
+import { createContext, useContext, useMemo, useState, useEffect } from 'react';
+import { BleManager, Device, BleError, Characteristic, Subscription } from "react-native-ble-plx";
 import { Threat } from "../classes";
 import { getGattUUIDs } from './getGattUUIDs';
 
@@ -11,6 +11,7 @@ interface BluetoothLowEnergyApi {
   disconnectFromDevice: (device: Device) => Promise<void>;
   handleConnectPress: (device: Device) => Promise<void>;
   getCharacteristicData: (func: string) => Promise<string | number | null>;
+  removeServiceSubscription: () => void;
   deviceList: Device[];
   connectedDevice: Device | null;
   threat: any;
@@ -23,6 +24,7 @@ const defaultContext: BluetoothLowEnergyApi = {
   disconnectFromDevice: null,
   handleConnectPress: null,
   getCharacteristicData: null,
+  removeServiceSubscription: null,
   deviceList: null,
   connectedDevice: null,
   threat: null,
@@ -35,7 +37,8 @@ export const BLEProvider = ({ children }) => {
   const [deviceList, setDeviceList] = useState<Device[]>([]);
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
   const [services, setServices] = useState<Record<string, any>>(null);
-  const [threat, setThreat] = useState(null);
+  const [serviceSubscription, setServiceSubscription] = useState<Subscription>(null);
+  const [threat, setThreat] = useState<Threat | null>(null);
 
 
   const isDuplicateDevice = (devices: Device[], nextDevice: Device) =>
@@ -153,7 +156,7 @@ export const BLEProvider = ({ children }) => {
       let id = binaryData[i];
       let distance = binaryData[i+1];
       let speed = binaryData[i+2];
-      threats.push(new Threat(id, distance, speed));
+      threats.push({id, distance, speed});
     };
     const t: Threat = threats.reduce((nearest, current) => {
       if (!nearest || current.distance < nearest.distance) {
@@ -219,6 +222,7 @@ export const BLEProvider = ({ children }) => {
       const { service, characteristic } = getGattUUIDs(func);
       if (func === "getSensorData") {
         const subscription = await connectedDevice.monitorCharacteristicForService(service, characteristic, onSensorUpdate);
+        setServiceSubscription(subscription);
       } else {
         const character = await connectedDevice.readCharacteristicForService(service, characteristic);
         return await decodeData(func, character.value);
@@ -227,6 +231,11 @@ export const BLEProvider = ({ children }) => {
       console.log("No Device Connected");
     }
   };
+
+  const removeServiceSubscription = (): void => {
+    serviceSubscription.remove();
+    setServiceSubscription(null);
+  }
 
 
   const handleConnectPress = async (device: Device): Promise<void> => {
@@ -237,8 +246,9 @@ export const BLEProvider = ({ children }) => {
     }
   };
 
+
   const bleApi: BluetoothLowEnergyApi = { startScan, stopScan, connectToDevice, 
-    disconnectFromDevice, handleConnectPress, getCharacteristicData,
+    disconnectFromDevice, handleConnectPress, getCharacteristicData, removeServiceSubscription,
     deviceList, connectedDevice, threat };
 
 

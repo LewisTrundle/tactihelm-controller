@@ -218,11 +218,16 @@ const labStudyStyles = StyleSheet.create({
     justifyContent: "space-around",
     padding: 10
   },
+  dropdownContainer: {
+    flexDirection: "column",
+    justifyContent: "center",
+  },
   dropdownButton: {
     width: 170,
     height: 50,
     backgroundColor: colors.pink,
-    borderRadius: 10
+    borderRadius: 10,
+    alignSelf: "center",
   },
   listContainer: {
     padding: 10,
@@ -240,17 +245,17 @@ const labStudyStyles = StyleSheet.create({
   valueText: {
     color: colors.tomato,
     alignSelf: "center",
-    fontSize: 20,
+    fontSize: 18,
     paddingBottom: 20
   },
   toggleSwitchContainer: {
-    paddingTop: 5,
+    padding: 10,
     alignItems: "center",
     width: "100%",
   },
   toggleSwitchLabel: {
     color: colors.white, 
-    fontSize: 14,
+    fontSize: 16,
   }
 });
 

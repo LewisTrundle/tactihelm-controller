@@ -1,246 +1,181 @@
-import { SafeAreaView, StatusBar, Text, View, ScrollView, LogBox } from "react-native";
-import { useState, useEffect } from "react";
+import { SafeAreaView, StatusBar, View, ScrollView, LogBox, Text } from "react-native";
+import { useEffect, useState } from "react";
 import { Input } from 'react-native-elements';
-import { CustomSelectDropdown, ItemList, CustomSlider, IconButton, CustomToggleSwitch, OpacityButton } from "../components";
-import { useBC } from '../utils';
+import { CustomSelectDropdown, ItemList, IconButton, CustomToggleSwitch, OpacityButton, AttributeSlider } from "../components";
+import { useBC, useBLE, useVibrationCommand, enumToArray, balancedLatinSquare } from '../utils';
 import { debugStyles, labStudyStyles } from "../styles";
-import { Command, CommandStrings, Scheme, SchemeStrings, Tactor, TactorStrings, 
-  Distance, DistanceStrings, Scenario, ScenarioStrings, enumToArray } from "../constants";
+import { Pattern, Scheme, Tactor, Scenario, ActivationType } from "../constants";
 
-type ActivationType = "MANUAL" | "SENSOR";
 
 
 const LabStudyScreen = () => {
-  const { writeToDevice } = useBC();
+  const { connectedDevice: bcConnectedDevice, writeToDevice } = useBC();
+  const { connectedDevice: bleConnectedDevice, getCharacteristicData, 
+    removeServiceSubscription, threat } = useBLE();
 
-  const [activationType, setActivationType] = useState<ActivationType>("MANUAL");
+  const { pattern, scheme, tactor, scenario, activationType, attributes, commandText,
+    updatePattern, updateScheme, updateTactor, updateScenario, updateActivationType, updateAttribute, updateCommandText } = useVibrationCommand();
+  let { intensity, stimulusDuration, isi, repetitions, rhythmDelay } = attributes;
 
-  const commands: CommandStrings[] = enumToArray(Command);
-  const rhythmSchemes: SchemeStrings[] = enumToArray(Scheme);
-  const tactors: TactorStrings[] = enumToArray(Tactor);
-  const scenarios: ScenarioStrings[] = enumToArray(Scenario);
-  const [command, setCommand] = useState<CommandStrings>(commands[0]);
-  const [scheme, setScheme] = useState<SchemeStrings>(rhythmSchemes[0]);
-  const [tactor, setTactor] = useState<TactorStrings>(tactors[0]);
-  const [scenario, setScenario] = useState<ScenarioStrings>(scenarios[0]);
+  const [playingScenario, setPlayingScenario] = useState<boolean>(false);
+  const [order, setOrder] = useState<string>('No order');
 
-  const [intensity, setIntensity] = useState<number>(255);
-  const [pulseDuration, setPulseDuration] = useState<number>(1_000);
-  const [interStimulusInterval, setInterstimulusInterval] = useState<number>(500);
-  const [repetitions, setRepetitions] = useState<number>(3);
-  const [rhythmDelay, setRhythmDelay] = useState<number>(1000);
-  const [cueDelay, setCueDelay] = useState<number>(5000);
+  
+  useEffect(() => {
+    LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
+  }, []);
 
-  const [valuesEnforced, setValuesEnforced] = useState<boolean>(false);
-
-  const [textValue, setTextValue] = useState('');
-
+  const updateOrder = (participantId: number) => {
+    const conditions: string[] = ["Singular Monotonic", "Singular Varying", "Wall Monotonic", "Wall Varying", "Wave Monotonic", "Wave Varying"];
+    const o = balancedLatinSquare(conditions, participantId-1);
+    setOrder(o.join('\n'));
+  }
+  
   const sendCommand = async (value: string) => {
     await writeToDevice(value);
   };
 
-  const updateCommand = (text?: string) => {
-    setTextValue(text ? text : `${command.toUpperCase()}:${(tactor as string).toUpperCase()},I${intensity},D${pulseDuration},S${interStimulusInterval},R${repetitions},L${rhythmDelay}`);
-  };
+  const playScenario = (scene: Scenario) => {
+    //if (!bcConnectedDevice) return;
+    console.log("Now playing scenario " + scene);
 
-  const enforceValues = () => {
-    const enforceRepetitions = () => {
-      const n_tactor: number = Tactor[tactor];
-      setRepetitions(n_tactor+1);
-    };
-    const enforceCueDelay = () => {
-      const n_tactor: number = Tactor[tactor];
-      setCueDelay(n_tactor == 0 ? 20_000 : n_tactor == 1 ? 10_000 : 5_000);
+    const delay = async (ms) => {
+      return new Promise((resolve) => 
+        setTimeout(resolve, ms));
     };
 
-    const n_scheme: number = Scheme[scheme];
-    switch (n_scheme) {
-      case 0:
-        setValuesEnforced(false);
+    const playReal = () => {
+      if (bleConnectedDevice) {
+        console.log("calling get sensor data")
+        getCharacteristicData("getSensorData");
+      } else {
+        console.log("Please connect to sensor");
+      }
+    }
+    const playScene1 = async () => {
+      await delay(2000);
+      console.log("hello")
+    }
+
+    setPlayingScenario(true);
+    switch (scenario) {
+      case Scenario.REAL:
+        playReal();
         return;
-      case 1:
-        setCueDelay(10_000);
-        break;
-      case 2:
-        enforceCueDelay();
-        break;
-      case 3:
-        // need actual values for following distance to do this
-        setCueDelay(500);
+      case Scenario.SCENE1:
+        playScene1();
         break;
     }
-    setValuesEnforced(true);
-    enforceRepetitions();
+    setPlayingScenario(false);
   };
-
-  const updateScenario = (scene: ScenarioStrings) => {
-    setScenario(scene);
-  }
-
-  const playScenario = (scene: ScenarioStrings) => {
-    console.log("Now playing scenario " + scene)
-    setTactor("FRONT");
-  };
-
-  useEffect(() => {
-    enforceValues();
-  }, [scheme, tactor]);
-
-  useEffect(() => {
-    updateCommand();
-  }, [command, tactor, intensity, pulseDuration, interStimulusInterval, repetitions, rhythmDelay]);
-
-  useEffect(() => {
-    LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
-  }, []);
 
 
   return (
     <SafeAreaView style={labStudyStyles.container}>
     <ScrollView>
       <StatusBar />
-
-      <Text style={labStudyStyles.text}>Command & Scheme</Text>
       <View style={labStudyStyles.dropdownsContainer}>
         <CustomSelectDropdown
-          data={commands}
-          onSelect={setCommand}
-          buttonText="Select an option"
-          defaultValue={command}
+          data={Array.from({ length: 20 }, (_, index) => index + 1)}
+          onSelect={updateOrder}
+          buttonText="Select Part. ID"
           buttonStyle={labStudyStyles.dropdownButton}
+          containerStyle={labStudyStyles.dropdownContainer}
+          title={"Condition Order"}
+          titleStyle={labStudyStyles.text}
+        />
+        <Text style={[labStudyStyles.text, labStudyStyles.smallText]}>{order}</Text>
+      </View>
+
+      <View style={labStudyStyles.dropdownsContainer}>
+        <CustomSelectDropdown
+          data={enumToArray(Pattern)}
+          onSelect={updatePattern}
+          buttonText="Select an option"
+          defaultValue={Pattern[pattern]}
+          buttonStyle={labStudyStyles.dropdownButton}
+          containerStyle={labStudyStyles.dropdownContainer}
+          title={"Pattern"}
+          titleStyle={labStudyStyles.text}
         />
         <CustomSelectDropdown
-          data={rhythmSchemes}
-          onSelect={setScheme}
+          data={enumToArray(Scheme)}
+          onSelect={updateScheme}
           buttonText="Select an option"
-          defaultValue={scheme}
+          defaultValue={Scheme[scheme]}
           buttonStyle={labStudyStyles.dropdownButton}
+          containerStyle={labStudyStyles.dropdownContainer}
+          title={"Duration Scheme"}
+          titleStyle={labStudyStyles.text}
         />
       </View>
     
       <CustomToggleSwitch
-        label={`Activation Type: ${activationType}`}
+        label={`Activation Type: ${ActivationType[activationType]}`}
         size={"medium"}
-        onToggle={() => setActivationType(activationType == "MANUAL" ? "SENSOR" : "MANUAL")}
+        onToggle={() => updateActivationType(activationType == ActivationType.MANUAL ? ActivationType.SENSOR : ActivationType.MANUAL)}
         containerStyle={labStudyStyles.toggleSwitchContainer}
         labelStyle={labStudyStyles.toggleSwitchLabel}
       />
       <View style={labStudyStyles.listContainer}>
-      {activationType == "MANUAL" ? (
+      {activationType == ActivationType.MANUAL ? (
         <ItemList 
-          items={tactors}
+          items={enumToArray(Tactor)}
           style={"tertiary"}
-          onPress={setTactor}
-          selectedItem={tactor}
+          onPress={updateTactor}
+          selectedItem={Tactor[tactor]}
           horizontal={true}
         />
       ) : (
         <ItemList 
-          items={scenarios}
+          items={enumToArray(Scenario)}
           style={"tertiary"}
           onPress={updateScenario}
-          selectedItem={scenario}
+          selectedItem={Scenario[scenario]}
           horizontal={true}
         />
       )}
       </View>
 
-      <Text style={labStudyStyles.text}>Intensity</Text>
-      <Text style={[labStudyStyles.text, labStudyStyles.smallText]}>The strength of a vibration.</Text>
-      <Text style={[labStudyStyles.text, labStudyStyles.smallText]}>Recommended: 255</Text>
-      <CustomSlider
-        onSlidingComplete={setIntensity}
-        startingValue={intensity}
-        minValue={0}
-        maxValue={255}
-        stepValue={5}
-        textColor={"white"}
-        maxTrackColor={"red"}
-      />
-      <Text style={labStudyStyles.text}>Stimulus Duration (ms)</Text>
-      <Text style={[labStudyStyles.text, labStudyStyles.smallText]}>The length of a single stimuli.</Text>
-      <Text style={[labStudyStyles.text, labStudyStyles.smallText]}>Recommended: 1000</Text>
-      <CustomSlider
-        onSlidingComplete={setPulseDuration}
-        startingValue={pulseDuration}
-        minValue={100}
-        maxValue={5_000}
-        stepValue={100}
-        textColor={"white"}
-        maxTrackColor={"red"}
-      />
-      <Text style={labStudyStyles.text}>Inter-Stimulus Interval (ms)</Text>
-      <Text style={[labStudyStyles.text, labStudyStyles.smallText]}>The time between consecutive stimuli in a rhythm.</Text>
-      <Text style={[labStudyStyles.text, labStudyStyles.smallText]}>Recommended: 500</Text>
-      <CustomSlider
-        onSlidingComplete={setInterstimulusInterval}
-        startingValue={interStimulusInterval}
-        minValue={100}
-        maxValue={2_000}
-        stepValue={100}
-        textColor={"white"}
-        maxTrackColor={"red"}
-      />
-      <Text style={labStudyStyles.text}>Rhythm Duration / Repetitions</Text>
-      <Text style={[labStudyStyles.text, labStudyStyles.smallText]}>The number of times a rhythm is repeated consecutively.</Text>
-      {activationType=="MANUAL" ? (
-        <Text style={labStudyStyles.valueText}>{repetitions}</Text>
-      ) : valuesEnforced ? (
-        <Text style={[labStudyStyles.valueText]}>Will vary during scenario.</Text>
-      ) : (
-        <CustomSlider
-          onSlidingComplete={setRepetitions}
-          startingValue={repetitions}
-          minValue={1}
-          maxValue={10}
-          stepValue={1}
-          textColor={"white"}
-          maxTrackColor={"red"}
-        />
-      )}
 
-      <Text style={labStudyStyles.text}>Inter-Rhythm Interval / Rhythm Delay (ms)</Text>
-      <Text style={[labStudyStyles.text, labStudyStyles.smallText]}>The time between consecutive rhythms in a cue.</Text>
-      <Text style={[labStudyStyles.text, labStudyStyles.smallText]}>Recommended: 1000</Text>
-      <CustomSlider
-        onSlidingComplete={setRhythmDelay}
-        startingValue={rhythmDelay}
-        minValue={50}
-        maxValue={2_000}
-        stepValue={50}
-        textColor={"white"}
-        maxTrackColor={"red"}
+      <AttributeSlider
+        attribute={intensity}
+        updateAttribute={updateAttribute}
       />
-      <Text style={labStudyStyles.text}>Inter-Cue Interval / Cue Delay (ms)</Text>
-      <Text style={[labStudyStyles.text, labStudyStyles.smallText]}>The time between consecutive cues</Text>
-      {activationType=="MANUAL" ? (
-        <Text style={labStudyStyles.valueText}>Not available with manual activation.</Text>
-      ) : valuesEnforced ? (
-        <Text style={[labStudyStyles.valueText]}>Will vary during scenario.</Text>
-      ) : (
-        <CustomSlider
-          onSlidingComplete={setCueDelay}
-          startingValue={cueDelay}
-          minValue={0}
-          maxValue={20_000}
-          stepValue={100}
-          textColor={"white"}
-          maxTrackColor={"red"}
-        />
-      )}
+      <AttributeSlider
+        attribute={stimulusDuration}
+        updateAttribute={updateAttribute}
+      />
+      <AttributeSlider
+        attribute={isi}
+        updateAttribute={updateAttribute}
+        renderCondition={pattern==Pattern.WAVE}
+        altElement={0}
+      />
+      <AttributeSlider
+        attribute={repetitions}
+        updateAttribute={updateAttribute}
+        renderCondition={scheme==Scheme.CUSTOM}
+        altElement={repetitions.currentValue}
+      />
+      <AttributeSlider
+        attribute={rhythmDelay}
+        updateAttribute={updateAttribute}
+      />
 
-      {activationType=="MANUAL" ? (
+
+      {activationType==ActivationType.MANUAL ? (
         <View style={debugStyles.sendTextContainer}>
           <View style={debugStyles.sendText}>
-            <Input style={labStudyStyles.text} value={textValue} onChangeText={text => updateCommand(text)} />
+            <Input style={labStudyStyles.text} value={commandText} onChangeText={text => updateCommandText(text)} />
           </View>
-          <IconButton style={debugStyles.sendButton} onPress={() => sendCommand(textValue)} iconName={"send"} size={35} color={'#FC7A1E'} />
+          <IconButton style={debugStyles.sendButton} onPress={() => sendCommand(commandText)} iconName={"send"} size={35} color={'#FC7A1E'} />
         </View>
       ) : (
         <OpacityButton 
-          text={`Play ${scenario}`}
+          text={`${playingScenario ? 'Stop' : 'Play'} ${Scenario[scenario]}`}
           style={"secondary"}
-          onPress={() => playScenario(scenario)}
+          onPress={() => playingScenario ? removeServiceSubscription() : playScenario(scenario)}
         />
       )}
 

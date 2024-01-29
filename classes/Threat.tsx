@@ -1,14 +1,6 @@
-import { ThreatLevels } from "../constants";
-
-export class Threat {
+export interface Threat {
   id: number;
   distance: number;
   speed: number;
-  level: ThreatLevels
-
-  constructor(id: number, distance: number, speed: number) {
-    this.id = id;
-    this.distance = distance;
-    this.speed = speed;
-  }
+  followingDistance?: number;
 };

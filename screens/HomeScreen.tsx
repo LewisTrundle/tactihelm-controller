@@ -16,16 +16,16 @@ const HomeScreen = ({ navigation }) => {
     checkPermissions();
   }, []);
 
-  useEffect(() => {
-    if (bleConnectedDevice) { // && bcConnectedDevice) {
-      console.log("calling get sensor data")
-      getCharacteristicData("getSensorData");
-    }
-  }, [bleConnectedDevice, bcConnectedDevice]);
+  // useEffect(() => {
+  //   if (bleConnectedDevice) { // && bcConnectedDevice) {
+  //     console.log("calling get sensor data")
+  //     getCharacteristicData("getSensorData");
+  //   }
+  // }, [bleConnectedDevice, bcConnectedDevice]);
 
-  useEffect(() => {
-    console.log(threat)
-  }, [threat])
+  // useEffect(() => {
+  //   //console.log(threat)
+  // }, [threat])
 
 
 
