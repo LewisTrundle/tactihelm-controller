@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getEnumType } from '../helpers/enumHelpers';
-import { Pattern, Scheme, Tactor, Scenario, ActivationType, AttributeList, Command } from "../../constants";
+import { Pattern, Scheme, Tactor, ActivationType, AttributeList, Command } from "../../constants";
 
 const Attributes: AttributeList = {
   intensity: { key: "intensity", name: "Intensity", description: "The strength of a vibration.", 
@@ -19,7 +19,6 @@ interface VibrationCommandApi {
   pattern: Pattern;
   scheme: Scheme;
   tactor: Tactor;
-  scenario: Scenario;
   activationType: ActivationType;
   attributes: AttributeList;
   commandText: Command | string;
@@ -35,7 +34,6 @@ export function useVibrationCommand(): VibrationCommandApi {
   const [pattern, setPattern] = useState<Pattern>(Pattern.SINGLE);
   const [scheme, setScheme] = useState<Scheme>(Scheme.CUSTOM);
   const [tactor, setTactor] = useState<Tactor | null>(Tactor.REAR);
-  const [scenario, setScenario] = useState<Scenario>(Scenario.PRACTICE);
   const [activationType, setActivationType] = useState<ActivationType>(ActivationType.MANUAL);
   const [attributes, setAttributes] = useState<AttributeList>(Attributes);
   const [commandText, setCommandText] = useState<Command | string>('');
@@ -64,9 +62,6 @@ export function useVibrationCommand(): VibrationCommandApi {
         break;
       case 'TACTOR':
         setTactor(parameter);
-        break;
-      case 'SCENARIO':
-        setScenario(parameter);
         break;
       case 'ACTIVATIONTYPE':
         setActivationType(parameter);
@@ -114,7 +109,6 @@ export function useVibrationCommand(): VibrationCommandApi {
     pattern,
     scheme,
     tactor,
-    scenario,
     activationType,
     attributes,
     commandText,

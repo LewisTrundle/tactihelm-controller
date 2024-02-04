@@ -1,25 +1,53 @@
 import { useState } from 'react';
-import { Tactor, Scenario } from "../../constants";
+import { Tactor } from "../../constants";
 
 interface PlayScenarioProps {
-  scenario: Scenario;
   bcConnectedDevice: any;
   updateCommand: any;
   setTactor: any;
 };
 
 interface ScenarioApi {
+  scenario: number;
   playingScenario: boolean;
   scenarioActive: boolean;
   answer: string;
+  updateScenario: (s: number) => void;
   playScenario: (playScenarioProps: PlayScenarioProps) => Promise<void>;
   addAnswer: (guess: string) => void;
   updateAnswer: (guess: string) => void;
   submitAnswer: () => void;
 };
 
+const scenarios = {
+  1: [[3000, "REAR"], [5000, "MID"], [7000, "FRONT"], [5000, "MID"], [4000, "REAR"], [6000, "MID"], [7000, "FRONT"]],
+  2: [[3000, "FRONT"], [6000, "MID"], [6000, "FRONT"], [6000, "REAR"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"], [6000, "MID"], [6000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "REAR"]],
+  3: [[3000, "MID"], [6000, "MID"], [6000, "REAR"], [6000, "REAR"], [6000, "FRONT"], [6000, "MID"], [6000, "FRONT"], [6000, "REAR"], [6000, "FRONT"], [6000, "REAR"], [6000, "FRONT"], [6000, "MID"]],
+
+  4: [[3000, "FRONT"], [5000, "MID"], [5000, "REAR"], [6000, "MID"], [6000, "FRONT"], [8000, "MID"], [7000, "REAR"]],
+  5: [[3000, "REAR"], [6000, "MID"], [6000, "REAR"], [6000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"], [6000, "FRONT"], [6000, "MID"], [6000, "FRONT"]],
+  6: [[3000, "FRONT"], [6000, "MID"], [6000, "REAR"], [6000, "MID"], [6000, "REAR"], [6000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"]],
+  
+  7: [[3000, "MID"], [5000, "FRONT"], [5000, "MID"], [6000, "REAR"], [7000, "MID"], [7000, "FRONT"], [8000, "MID"]],
+  8: [[3000, "MID"], [6000, "MID"], [6000, "REAR"], [6000, "FRONT"], [6000, "FRONT"], [6000, "MID"], [6000, "REAR"], [6000, "REAR"], [6000, "FRONT"], [6000, "MID"], [6000, "REAR"], [6000, "FRONT"]],
+  9: [[3000, "REAR"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"], [6000, "MID"], [6000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"], [6000, "MID"], [6000, "REAR"], [6000, "FRONT"]],
+  
+  10: [[3000, "REAR"], [4000, "MID"], [6000, "FRONT"], [7000, "MID"], [8000, "FRONT"], [4000, "MID"], [4000, "REAR"]],
+  11: [[3000, "MID"], [6000, "REAR"], [6000, "FRONT"], [6000, "MID"], [6000, "REAR"], [6000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"], [6000, "MID"], [6000, "FRONT"], [6000, "REAR"]],
+  12: [[3000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"], [6000, "MID"], [6000, "FRONT"], [6000, "MID"], [6000, "REAR"], [6000, "FRONT"], [6000, "MID"], [6000, "REAR"], [6000, "REAR"]],
+
+  13: [[3000, "FRONT"], [5000, "MID"], [5000, "FRONT"], [6000, "MID"], [6000, "REAR"], [8000, "MID"], [7000, "FRONT"]],
+  14: [[3000, "REAR"], [6000, "FRONT"], [6000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"], [6000, "FRONT"], [6000, "MID"], [6000, "MID"], [6000, "REAR"]],
+  15: [[3000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"], [6000, "REAR"], [6000, "FRONT"], [6000, "MID"], [6000, "FRONT"], [6000, "MID"], [6000, "REAR"], [6000, "MID"], [6000, "REAR"]],
+  
+  16: [[3000, "MID"], [3000, "REAR"], [4000, "MID"], [6000, "FRONT"], [5000, "MID"], [6000, "FRONT"], [7000, "MID"]],
+  17: [[3000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"], [6000, "MID"], [6000, "REAR"], [6000, "FRONT"], [6000, "MID"], [6000, "FRONT"], [6000, "REAR"]],
+  18: [[3000, "REAR"], [6000, "MID"], [6000, "MID"], [6000, "FRONT"], [6000, "REAR"], [6000, "FRONT"], [6000, "MID"], [6000, "REAR"], [6000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"]],
+};
+
 
 export function useScenario(): ScenarioApi {
+  const [scenario, setScenario] = useState<number>(0);
   const [playingScenario, setPlayingScenario] = useState<boolean>(false);
   const [scenarioActive, setScenarioActive] = useState<boolean>(false);
   const [answer, setAnswer] = useState<string>('');
@@ -44,8 +72,12 @@ export function useScenario(): ScenarioApi {
     setAnswer('');
   };
 
+  const updateScenario = (s: number): void => {
+    setScenario(s);
+  };
 
-  const playScenario = async ({ scenario, bcConnectedDevice, updateCommand, setTactor }: PlayScenarioProps): Promise<void> => {
+
+  const playScenario = async ({ bcConnectedDevice, updateCommand, setTactor }: PlayScenarioProps): Promise<void> => {
     if (!bcConnectedDevice) return;
     console.log("\nNow playing scenario " + scenario);
 
@@ -54,119 +86,32 @@ export function useScenario(): ScenarioApi {
       await updateCommand(tactor);
     };
 
-    // FAR, NEAR, IMMINENT, NEAR, IMMINENT, NEAR, FAR
-    // medium pace approach, quickly transitions between close and imminent
-    const playScene1 = async (): Promise<void> => {
+    const playScene = async () => {
+      const scene = scenarios[scenario];
       await setTactor(null);
-      await fakeVibrate(3000, Tactor.REAR);
-      await fakeVibrate(6000, Tactor.MID);
-      await fakeVibrate(2000, Tactor.FRONT);
-      await fakeVibrate(2000, Tactor.MID);
-      await fakeVibrate(2000, Tactor.FRONT);
-      await fakeVibrate(3000, Tactor.MID);
-      await fakeVibrate(8000, Tactor.REAR);
-    };
-
-    // NEAR, IMMINENT, NEAR, FAR, NEAR, IMMINENT, NEAR 
-    // first detected at mid, slowly approaches and goes away, quickly approaches again
-    const playScene2 = async () => {
-      await setTactor(null);
-      await fakeVibrate(3000, Tactor.MID);
-      await fakeVibrate(8000, Tactor.FRONT);
-      await fakeVibrate(8000, Tactor.MID);
-      await fakeVibrate(8000, Tactor.REAR);
-      await fakeVibrate(5000, Tactor.MID);
-      await fakeVibrate(2000, Tactor.FRONT);
-      await fakeVibrate(2000, Tactor.MID);
-    };
-
-    // FAR, NEAR, IMMINENT, NEAR, FAR, NEAR 
-    const playScene3 = async () => {
-      await setTactor(null);
-      await fakeVibrate(3000, Tactor.REAR);
-      await fakeVibrate(7000, Tactor.MID);
-      await fakeVibrate(7000, Tactor.FRONT);
-      await fakeVibrate(10000, Tactor.MID);
-      await fakeVibrate(7000, Tactor.REAR);
-      await fakeVibrate(5000, Tactor.MID);
-    };
-
-    // FAR, NEAR, IMMINENT, NEAR, IMMINENT, NEAR, FAR 
-    const playScene4 = async () => {
-      await setTactor(null);
-      await fakeVibrate(3000, Tactor.REAR);
-      await fakeVibrate(2000, Tactor.MID);
-      await fakeVibrate(2000, Tactor.FRONT);
-      await fakeVibrate(5000, Tactor.MID);
-      await fakeVibrate(5000, Tactor.FRONT);
-      await fakeVibrate(2000, Tactor.MID);
-      await fakeVibrate(2000, Tactor.REAR);
-    };
-
-    // NEAR, IMMINENT, NEAR, FAR, NEAR, IMMINENT, NEAR 
-    // first detected at mid, slowly approaches and goes away, quickly approaches again
-    const playScene5 = async () => {
-      await setTactor(null);
-      await fakeVibrate(3000, Tactor.MID);
-      await fakeVibrate(8000, Tactor.FRONT);
-      await fakeVibrate(8000, Tactor.MID);
-      await fakeVibrate(8000, Tactor.REAR);
-      await fakeVibrate(5000, Tactor.MID);
-      await fakeVibrate(2000, Tactor.FRONT);
-      await fakeVibrate(2000, Tactor.MID);
-    };
-
-    // NEAR, IMMINENT, NEAR, FAR, NEAR, IMMINENT, NEAR 
-    // first detected at mid, slowly approaches and goes away, quickly approaches again
-    const playScene6 = async () => {
-      await setTactor(null);
-      await fakeVibrate(3000, Tactor.MID);
-      await fakeVibrate(8000, Tactor.FRONT);
-      await fakeVibrate(8000, Tactor.MID);
-      await fakeVibrate(8000, Tactor.REAR);
-      await fakeVibrate(5000, Tactor.MID);
-      await fakeVibrate(2000, Tactor.FRONT);
-      await fakeVibrate(2000, Tactor.MID);
+      for (let i = 0; i < 10; i++) {
+        const delay: number = scene[i][0];
+        const tactor: Tactor = scene[i][1];
+        await fakeVibrate(delay, tactor);
+      }
     };
 
     setPlayingScenario(true);
-    switch (scenario) {
-      case Scenario.PRACTICE:
-        return;
-      case Scenario.SCENE1:
-        setScenarioActive(true);
-        await playScene1();
-        break;
-      case Scenario.SCENE2:
-        setScenarioActive(true);
-        await playScene2();
-        break;
-      case Scenario.SCENE3:
-        setScenarioActive(true);
-        await playScene3();
-        break;
-      case Scenario.SCENE4:
-        setScenarioActive(true);
-        await playScene4();
-        break;
-      case Scenario.SCENE5:
-        setScenarioActive(true);
-        await playScene5();
-        break;
-      case Scenario.SCENE6:
-        setScenarioActive(true);
-        await playScene6();
-        break;
-    }
+    if (scenario==0) return;
+    setScenarioActive(true);
+    await playScene();
+
     await delay(2000);
     setScenarioActive(false);
     console.log("\nFinished playing scenario " + scenario);
   };
 
   return {
+    scenario,
     playingScenario,
     scenarioActive,
     answer,
+    updateScenario,
     playScenario,
     addAnswer,
     updateAnswer,

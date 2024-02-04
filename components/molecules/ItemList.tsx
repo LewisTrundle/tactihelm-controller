@@ -26,7 +26,7 @@ export const ItemList = ({items, renderProperty, style, onPress, canTouch=true, 
           style={style}
           onPress={() => canTouch && onPress(item)}
           disabled={disabled}
-          looksDisabled={(selectedItem !== null && selectedItem !== item)}
+          looksDisabled={(selectedItem !== null && selectedItem.toString() !== item)}
         />
         </TouchableWithoutFeedback>
       )}

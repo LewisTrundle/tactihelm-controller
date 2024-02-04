@@ -22,15 +22,6 @@ export enum Distance {
   IMMINENT = 'IMMINENT'
 };
 
-export enum Scenario {
-  PRACTICE = 'PRACTICE',
-  SCENE1 = 'SCENE1',
-  SCENE2 = 'SCENE2',
-  SCENE3 = 'SCENE3',
-  SCENE4 = 'SCENE4',
-  SCENE5 = 'SCENE5',
-  SCENE6 = 'SCENE6'
-}
 
 export enum ActivationType {
   MANUAL = 'MANUAL',

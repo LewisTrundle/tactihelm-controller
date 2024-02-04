@@ -4,17 +4,19 @@ import { Input } from 'react-native-elements';
 import { CustomSelectDropdown, ItemList, IconButton, CustomToggleSwitch, OpacityButton, AttributeSlider } from "../components";
 import { useBC, useVibrationCommand, useScenario, enumToArray, balancedLatinSquare } from '../utils';
 import { debugStyles, labStudyStyles } from "../styles";
-import { Pattern, Scheme, Tactor, Distance, Scenario, ActivationType } from "../constants";
+import { Pattern, Scheme, Tactor, Distance, ActivationType } from "../constants";
 
 
 
 const LabStudyScreen = () => {
   const { connectedDevice: bcConnectedDevice, writeToDevice } = useBC();
-  const { pattern, scheme, tactor, scenario, activationType, attributes, commandText, updateCounter,
+
+  const { pattern, scheme, tactor, activationType, attributes, commandText, updateCounter,
     updateAttribute, updateCommand, updateCommandText, setTactor } = useVibrationCommand();
   let { intensity, stimulusDuration, isi, repetitions, rhythmDelay } = attributes;
-  const { playingScenario, scenarioActive, answer,
-    playScenario, addAnswer, updateAnswer, submitAnswer } = useScenario();
+  
+  const { scenario, playingScenario, scenarioActive, answer,
+    updateScenario, playScenario, addAnswer, updateAnswer, submitAnswer } = useScenario();
 
   const [order, setOrder] = useState<string>('No order');
 
@@ -24,10 +26,23 @@ const LabStudyScreen = () => {
   }, [playingScenario]);
 
   const updateOrder = (participantId: number) => {
-    const conditions: string[] = ["Singular Monotonic", "Singular Varying", "Wall Monotonic", "Wall Varying", "Wave Monotonic", "Wave Varying"];
-    const o = balancedLatinSquare(conditions, participantId-1);
-    setOrder(o.join('\n'));
-  }
+    const patterns: string[] = enumToArray(Pattern);
+    const schemes: string[] = ["MONOTONIC", "VARYING"];
+    const patternOrder: string[] = balancedLatinSquare(patterns, participantId-1);
+    const schemeOrder: string[] = balancedLatinSquare(schemes, participantId-1);
+    const order: string[] = combineArrays(patternOrder, schemeOrder);
+    setOrder(order.join('\n'));
+  };
+
+  function combineArrays(arr1: string[], arr2: string[]): string[] {
+    let combined = [];
+    for (let i = 0; i < arr1.length; i++) {
+      for (let j = 0; j < arr2.length; j++) {
+        combined.push(`${arr1[i]} ${arr2[j]}`);
+      }
+    }
+    return combined;
+  };
 
   const vibrate = () => {
     writeToDevice(commandText);
@@ -77,7 +92,7 @@ const LabStudyScreen = () => {
           </View>
 
           <OpacityButton 
-            text={scenario==Scenario.PRACTICE ? "Stop" : "Submit Answers"}
+            text={scenario==0 ? "Stop" : "Submit Answers"}
             style={"secondary"}
             disabled={scenarioActive}
             onPress={() => submitAnswer()}
@@ -143,9 +158,9 @@ const LabStudyScreen = () => {
             />
           ) : (
             <ItemList 
-              items={enumToArray(Scenario)}
+              items={Array.from({ length: 19 }, (_, i) => (i).toString())}
               style={"tertiary"}
-              onPress={updateCommand}
+              onPress={updateScenario}
               selectedItem={scenario}
               horizontal={true}
             />
@@ -188,9 +203,9 @@ const LabStudyScreen = () => {
             </View>
           ) : (
             <OpacityButton 
-              text={`${playingScenario ? 'Stop' : 'Play'} ${Scenario[scenario]}`}
+              text={`${playingScenario ? 'Stop' : 'Play'} Scenario ${scenario}`}
               style={"secondary"}
-              onPress={() => playScenario({scenario, bcConnectedDevice, updateCommand, setTactor})}
+              onPress={() => playScenario({bcConnectedDevice, updateCommand, setTactor})}
             />
           )}
 
