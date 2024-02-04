@@ -1,4 +1,4 @@
-import { GattServices, GattCharacteristics, GattFunction } from "../constants";
+import { GattServices, GattCharacteristics, GattFunction } from "../../constants";
 
 
 type GattFunctionMappings = {

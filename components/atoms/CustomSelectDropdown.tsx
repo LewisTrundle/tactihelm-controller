@@ -2,7 +2,7 @@ import { View, Text } from "react-native";
 import SelectDropdown from 'react-native-select-dropdown';
 
 type CustomSelectDropdownProps = {
-  data: (number | string)[];
+  data: any[];
   onSelect?: any;
   buttonText?: string;
   defaultValue?: string;

@@ -256,6 +256,18 @@ const labStudyStyles = StyleSheet.create({
   toggleSwitchLabel: {
     color: colors.white, 
     fontSize: 16,
+  },
+
+  tactorsContainer: {
+    margin: 20,
+   // display: "none"
+  },
+  distancesContainer: {
+    marginTop: 50,
+  },
+
+  largeText: {
+    fontSize: 24
   }
 });
 

@@ -1,9 +1,9 @@
 import { BluetoothTypes } from "./BluetoothTypes";
 import { GattServices, GattCharacteristics, GattFunction } from "./GattUUIDs";
-import { Pattern, Scheme, Tactor, Scenario, ActivationType } from "./CommandOptions";
+import { Pattern, Scheme, Tactor, Distance, Scenario, ActivationType, AttributeList, Command } from "./CommandOptions";
 
 export { 
   BluetoothTypes, 
   GattServices, GattCharacteristics, GattFunction,
-  Pattern, Scheme, Tactor, Scenario, ActivationType
+  Pattern, Scheme, Tactor, Distance, Scenario, ActivationType, AttributeList, Command
 };

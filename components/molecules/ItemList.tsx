@@ -4,15 +4,16 @@ import { OpacityButton } from "../atoms/OpacityButton";
 type ItemListProps = {
   items: any[]
   renderProperty?: string;
-  onPress: any
+  onPress?: any
   style?: string
+  canTouch?: boolean;
   horizontal?: boolean;
   selectedItem?: any
   disabled?: boolean
 };
 
 
-export const ItemList = ({items, renderProperty, style, onPress, horizontal=false, selectedItem=null, disabled=false}: ItemListProps)  => {
+export const ItemList = ({items, renderProperty, style, onPress, canTouch=true, horizontal=false, selectedItem=null, disabled=false}: ItemListProps)  => {
   return (
     <FlatList
       data={items}
@@ -23,7 +24,7 @@ export const ItemList = ({items, renderProperty, style, onPress, horizontal=fals
         <OpacityButton 
           text={renderProperty ? item[renderProperty] : item}
           style={style}
-          onPress={() => onPress(item)}
+          onPress={() => canTouch && onPress(item)}
           disabled={disabled}
           looksDisabled={(selectedItem !== null && selectedItem !== item)}
         />

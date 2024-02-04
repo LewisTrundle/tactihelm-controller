@@ -1,7 +1,13 @@
-import { createContext, useContext, useMemo, useState, useEffect } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
 import { BleManager, Device, BleError, Characteristic, Subscription } from "react-native-ble-plx";
-import { Threat } from "../classes";
-import { getGattUUIDs } from './getGattUUIDs';
+import { getGattUUIDs } from '../helpers/getGattUUIDs';
+
+interface Threat {
+  id: number;
+  distance: number;
+  speed: number;
+  followingDistance?: number;
+};
 
 
 interface BluetoothLowEnergyApi {
@@ -156,7 +162,8 @@ export const BLEProvider = ({ children }) => {
       let id = binaryData[i];
       let distance = binaryData[i+1];
       let speed = binaryData[i+2];
-      threats.push({id, distance, speed});
+      let followingDistance = distance/speed;
+      threats.push({id, distance, speed, followingDistance});
     };
     const t: Threat = threats.reduce((nearest, current) => {
       if (!nearest || current.distance < nearest.distance) {

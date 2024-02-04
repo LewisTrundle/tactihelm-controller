@@ -5,20 +5,23 @@ import ToggleSwitch from 'toggle-switch-react-native';
 type Size = "small" | "medium" | "large";
 
 type CustomToggleSwitchProps = {
+  isOn?: boolean;
   label?: string;
   size?: Size;
   onToggle?: any;
   containerStyle?: any;
   labelStyle?: any;
+  offState?: any;
+  onState?: any;
 }
 
-export const CustomToggleSwitch = ({ label, size, onToggle, containerStyle, labelStyle }: CustomToggleSwitchProps) => {
+export const CustomToggleSwitch = ({ isOn, label, size, onToggle, containerStyle, labelStyle, offState, onState }: CustomToggleSwitchProps) => {
   const [isToggleOn, setIsToggleOn] = useState<boolean>(false);
   
   return (
     <View style={containerStyle}>
       <ToggleSwitch
-        isOn={isToggleOn}
+        isOn={isOn ? isOn : isToggleOn}
         onColor="green"
         offColor="red"
         label={label}
@@ -26,7 +29,7 @@ export const CustomToggleSwitch = ({ label, size, onToggle, containerStyle, labe
         size={size}
         onToggle={isOn => {
           setIsToggleOn(isOn)
-          onToggle();
+          onToggle(isOn ? onState : offState);
         }}
         disabled={false}
         animationSpeed={200}
