@@ -12,7 +12,7 @@ const LabStudyScreen = () => {
   const { connectedDevice: bcConnectedDevice, writeToDevice } = useBC();
 
   const { pattern, scheme, tactor, activationType, attributes, commandText, updateCounter,
-    updateAttribute, updateCommand, updateCommandText, setTactor } = useVibrationCommand();
+    updateAttribute, updateCommand, updateCommandText, setTactor, setAttributeUpdated } = useVibrationCommand();
   let { intensity, stimulusDuration, isi, repetitions, rhythmDelay } = attributes;
   
   const { scenario, playingScenario, scenarioActive, answer,
@@ -31,6 +31,7 @@ const LabStudyScreen = () => {
     const patternOrder: string[] = balancedLatinSquare(patterns, participantId-1);
     const schemeOrder: string[] = balancedLatinSquare(schemes, participantId-1);
     const order: string[] = combineArrays(patternOrder, schemeOrder);
+    console.log(order)
     setOrder(order.join('\n'));
   };
 
@@ -205,7 +206,7 @@ const LabStudyScreen = () => {
             <OpacityButton 
               text={`${playingScenario ? 'Stop' : 'Play'} Scenario ${scenario}`}
               style={"secondary"}
-              onPress={() => playScenario({bcConnectedDevice, updateCommand, setTactor})}
+              onPress={() => playScenario({bcConnectedDevice, updateCommand, setTactor, setAttributeUpdated})}
             />
           )}
 

@@ -5,6 +5,7 @@ interface PlayScenarioProps {
   bcConnectedDevice: any;
   updateCommand: any;
   setTactor: any;
+  setAttributeUpdated: any;
 };
 
 interface ScenarioApi {
@@ -20,29 +21,29 @@ interface ScenarioApi {
 };
 
 const scenarios = {
-  1: [[3000, "REAR"], [5000, "MID"], [7000, "FRONT"], [5000, "MID"], [4000, "REAR"], [6000, "MID"], [7000, "FRONT"]],
-  2: [[3000, "FRONT"], [6000, "MID"], [6000, "FRONT"], [6000, "REAR"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"], [6000, "MID"], [6000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "REAR"]],
-  3: [[3000, "MID"], [6000, "MID"], [6000, "REAR"], [6000, "REAR"], [6000, "FRONT"], [6000, "MID"], [6000, "FRONT"], [6000, "REAR"], [6000, "FRONT"], [6000, "REAR"], [6000, "FRONT"], [6000, "MID"]],
+  1: ["REAR", "MID", "FRONT", "MID", "REAR", "MID", "FRONT"],
+  2: ["FRONT", "MID", "FRONT", "REAR", "REAR", "MID", "FRONT", "MID", "FRONT", "REAR", "MID", "REAR"],
+  3: ["MID", "MID", "REAR", "REAR", "FRONT", "MID", "FRONT", "REAR", "FRONT", "REAR", "FRONT", "MID"],
 
-  4: [[3000, "FRONT"], [5000, "MID"], [5000, "REAR"], [6000, "MID"], [6000, "FRONT"], [8000, "MID"], [7000, "REAR"]],
-  5: [[3000, "REAR"], [6000, "MID"], [6000, "REAR"], [6000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"], [6000, "FRONT"], [6000, "MID"], [6000, "FRONT"]],
-  6: [[3000, "FRONT"], [6000, "MID"], [6000, "REAR"], [6000, "MID"], [6000, "REAR"], [6000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"]],
+  4: ["FRONT", "MID", "REAR", "MID", "FRONT", "MID", "REAR"],
+  5: ["REAR", "MID", "REAR", "FRONT", "REAR", "MID", "REAR", "MID", "FRONT", "FRONT", "MID", "FRONT"],
+  6: ["FRONT", "MID", "REAR", "MID", "REAR", "FRONT", "REAR", "MID", "FRONT", "REAR", "MID", "FRONT"],
   
-  7: [[3000, "MID"], [5000, "FRONT"], [5000, "MID"], [6000, "REAR"], [7000, "MID"], [7000, "FRONT"], [8000, "MID"]],
-  8: [[3000, "MID"], [6000, "MID"], [6000, "REAR"], [6000, "FRONT"], [6000, "FRONT"], [6000, "MID"], [6000, "REAR"], [6000, "REAR"], [6000, "FRONT"], [6000, "MID"], [6000, "REAR"], [6000, "FRONT"]],
-  9: [[3000, "REAR"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"], [6000, "MID"], [6000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"], [6000, "MID"], [6000, "REAR"], [6000, "FRONT"]],
+  7: ["MID", "FRONT", "MID", "REAR", "MID", "FRONT", "MID"],
+  8: ["MID", "MID", "REAR", "FRONT", "FRONT", "MID", "REAR", "REAR", "FRONT", "MID", "REAR", "FRONT"],
+  9: ["REAR", "REAR", "MID", "FRONT", "MID", "FRONT", "REAR", "MID", "FRONT", "MID", "REAR", "FRONT"],
   
-  10: [[3000, "REAR"], [4000, "MID"], [6000, "FRONT"], [7000, "MID"], [8000, "FRONT"], [4000, "MID"], [4000, "REAR"]],
-  11: [[3000, "MID"], [6000, "REAR"], [6000, "FRONT"], [6000, "MID"], [6000, "REAR"], [6000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"], [6000, "MID"], [6000, "FRONT"], [6000, "REAR"]],
-  12: [[3000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"], [6000, "MID"], [6000, "FRONT"], [6000, "MID"], [6000, "REAR"], [6000, "FRONT"], [6000, "MID"], [6000, "REAR"], [6000, "REAR"]],
+  10: ["REAR", "MID", "FRONT", "MID", "FRONT", "MID", "REAR"],
+  11: ["MID", "REAR", "FRONT", "MID", "REAR", "FRONT", "REAR", "MID", "FRONT", "MID", "FRONT", "REAR"],
+  12: ["FRONT", "REAR", "MID", "FRONT", "MID", "FRONT", "MID", "REAR", "FRONT", "MID", "REAR", "REAR"],
 
-  13: [[3000, "FRONT"], [5000, "MID"], [5000, "FRONT"], [6000, "MID"], [6000, "REAR"], [8000, "MID"], [7000, "FRONT"]],
-  14: [[3000, "REAR"], [6000, "FRONT"], [6000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"], [6000, "FRONT"], [6000, "MID"], [6000, "MID"], [6000, "REAR"]],
-  15: [[3000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"], [6000, "REAR"], [6000, "FRONT"], [6000, "MID"], [6000, "FRONT"], [6000, "MID"], [6000, "REAR"], [6000, "MID"], [6000, "REAR"]],
+  13: ["FRONT", "MID", "FRONT", "MID", "REAR", "MID", "FRONT"],
+  14: ["REAR", "FRONT", "FRONT", "REAR", "MID", "REAR", "MID", "FRONT", "FRONT", "MID", "MID", "REAR"],
+  15: ["FRONT", "REAR", "MID", "FRONT", "REAR", "FRONT", "MID", "FRONT", "MID", "REAR", "MID", "REAR"],
   
-  16: [[3000, "MID"], [3000, "REAR"], [4000, "MID"], [6000, "FRONT"], [5000, "MID"], [6000, "FRONT"], [7000, "MID"]],
-  17: [[3000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"], [6000, "MID"], [6000, "REAR"], [6000, "FRONT"], [6000, "MID"], [6000, "FRONT"], [6000, "REAR"]],
-  18: [[3000, "REAR"], [6000, "MID"], [6000, "MID"], [6000, "FRONT"], [6000, "REAR"], [6000, "FRONT"], [6000, "MID"], [6000, "REAR"], [6000, "FRONT"], [6000, "REAR"], [6000, "MID"], [6000, "FRONT"]],
+  16: ["MID", "REAR", "MID", "FRONT", "MID", "FRONT", "MID"],
+  17: ["FRONT", "REAR", "MID","REAR", "MID", "FRONT", "MID", "REAR", "FRONT", "MID", "FRONT", "REAR"],
+  18: ["REAR", "MID", "MID", "FRONT", "REAR", "FRONT", "MID", "REAR", "FRONT", "REAR", "MID", "FRONT"],
 };
 
 
@@ -77,22 +78,21 @@ export function useScenario(): ScenarioApi {
   };
 
 
-  const playScenario = async ({ bcConnectedDevice, updateCommand, setTactor }: PlayScenarioProps): Promise<void> => {
+  const playScenario = async ({ bcConnectedDevice, updateCommand, setTactor, setAttributeUpdated }: PlayScenarioProps): Promise<void> => {
     if (!bcConnectedDevice) return;
     console.log("\nNow playing scenario " + scenario);
 
     const fakeVibrate = async (delayAmount: number, tactor: Tactor | string): Promise<void> => {
       await delay(delayAmount);
       await updateCommand(tactor);
+      setAttributeUpdated(true);
     };
 
     const playScene = async () => {
       const scene = scenarios[scenario];
       await setTactor(null);
-      for (let i = 0; i < 10; i++) {
-        const delay: number = scene[i][0];
-        const tactor: Tactor = scene[i][1];
-        await fakeVibrate(delay, tactor);
+      for (let i = 0; i < scene.length; i++) {
+        await fakeVibrate(5000, scene[i]);
       }
     };
 

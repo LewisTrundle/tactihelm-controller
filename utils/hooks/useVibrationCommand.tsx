@@ -27,6 +27,7 @@ interface VibrationCommandApi {
   updateCommand: (parameter: any) => void;
   setTactor: any;
   updateCommandText: (text?: string) => void;
+  setAttributeUpdated: any;
 };
 
 
@@ -116,6 +117,7 @@ export function useVibrationCommand(): VibrationCommandApi {
     updateAttribute,
     updateCommand,
     setTactor,
-    updateCommandText
+    updateCommandText,
+    setAttributeUpdated
   }
 }
