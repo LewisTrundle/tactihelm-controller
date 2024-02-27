@@ -1,5 +1,5 @@
 import { View, Modal, TouchableOpacity, Text } from 'react-native';
-import { styles, modalStyles }  from '../../styles';
+import { modalStyles }  from '../../styles';
 
 type AlertModalProps = {
   title?: string
@@ -18,7 +18,7 @@ export const AlertModal = ({title, children, visible, onConfirm, onClose, confir
         <View style={modalStyles.content}>
           <Text style={modalStyles.titleText}>{title}</Text>
           {children}
-          <View style={[modalStyles.buttons, (!onClose||!onConfirm) && styles.center]}>
+          <View style={[modalStyles.buttons, (!onClose||!onConfirm) && modalStyles.center]}>
             {onClose && (
               <TouchableOpacity style={modalStyles.confirmButton} onPress={onClose}>
                 <Text style={modalStyles.confirmButtonText}>{cancelText}</Text>

@@ -11,14 +11,15 @@ type CustomSliderProps = {
   textColor?: string;
   minTrackColor?: string;
   maxTrackColor?: string;
+  alterValue?: number
 }
 
 export const CustomSlider = ({ onSlidingComplete, startingValue=0, minValue=0, maxValue=10, stepValue=1, 
-  textColor="black", minTrackColor="white", maxTrackColor="black" }: CustomSliderProps) => {
+  textColor="black", minTrackColor="white", maxTrackColor="black", alterValue=1 }: CustomSliderProps) => {
   const [sliderValue, setSliderValue] = useState<number>(startingValue);
   return (
     <View style={{flexDirection: "row", justifyContent: 'center', alignItems: 'center'}}>
-      <Text style={{color: textColor}}>{sliderValue}</Text>
+      <Text style={{color: textColor}}>{sliderValue/alterValue}</Text>
       <Slider
         style={{width: "90%", height: 60}}
         value={sliderValue}
@@ -28,7 +29,7 @@ export const CustomSlider = ({ onSlidingComplete, startingValue=0, minValue=0, m
         maximumTrackTintColor={maxTrackColor}
         step={stepValue}
         onValueChange={(value) => setSliderValue(value)}
-        onSlidingComplete={(value) => onSlidingComplete ? onSlidingComplete(value) : console.log(value)}
+        onSlidingComplete={(value) => onSlidingComplete ? onSlidingComplete(value/alterValue) : console.log(value)}
       />
     </View>
   )

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getEnumType } from '../helpers/enumHelpers';
 import { Pattern, Scheme, Tactor, ActivationType, AttributeList, Command } from "../../constants";
 
@@ -28,6 +28,8 @@ interface VibrationCommandApi {
   setTactor: any;
   updateCommandText: (text?: string) => void;
   setAttributeUpdated: any;
+  commandTextRef: any;
+  tactorRef: any
 };
 
 
@@ -41,6 +43,13 @@ export function useVibrationCommand(): VibrationCommandApi {
 
   const [attributeUpdated, setAttributeUpdated] = useState(false);  // only updateCommand once
   const [updateCounter, setUpdateCounter] = useState<number>(0);    // triggers useEffect even if command not updated
+
+  const commandTextRef = useRef(commandText);
+  const tactorRef = useRef(tactor);
+
+  useEffect(() => {
+    tactorRef.current = tactor;
+  }, [tactor]);
 
 
   const updateAttribute = (key: string, value: number): void => {
@@ -95,6 +104,7 @@ export function useVibrationCommand(): VibrationCommandApi {
 
 
   const updateCommandText = (text?: string) => {
+    commandTextRef.current = text ? text : `${Pattern[pattern].toUpperCase()}:${tactor.toString().toUpperCase()},I${attributes.intensity.currentValue},D${attributes.stimulusDuration.currentValue},S${attributes.isi.currentValue},R${attributes.repetitions.currentValue},L${attributes.rhythmDelay.currentValue}`;
     setCommandText(text ? text : `${Pattern[pattern].toUpperCase()}:${tactor.toString().toUpperCase()},I${attributes.intensity.currentValue},D${attributes.stimulusDuration.currentValue},S${attributes.isi.currentValue},R${attributes.repetitions.currentValue},L${attributes.rhythmDelay.currentValue}`);
   };
   useEffect(() => {
@@ -114,6 +124,8 @@ export function useVibrationCommand(): VibrationCommandApi {
     attributes,
     commandText,
     updateCounter,
+    commandTextRef,
+    tactorRef,
     updateAttribute,
     updateCommand,
     setTactor,

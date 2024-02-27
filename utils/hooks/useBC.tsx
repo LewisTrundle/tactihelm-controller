@@ -49,14 +49,15 @@ export const BCProvider = ({ children }) => {
   const [isBluetoothSupported, setIsBluetoothSupported] = useState<boolean>(false);
   const [isBluetoothEnabled, setIsBluetoothEnabled] = useState<boolean>(false);
   const [pairedDevices, setPairedDevices] = useState<BluetoothDevice[]>([]);
+  
 
   const startScan = async (): Promise<void> => {
     if (Platform.OS === 'android') {
       try {
         console.log("in discovery")
-        const unpaired = await RNBluetoothClassic.startDiscovery();
-        setDeviceList(unpaired)
-        unpaired.forEach((device) => console.log(device.name, device.address, device.bonded));
+        const devices = await RNBluetoothClassic.startDiscovery();
+        setDeviceList(devices)
+        devices.forEach((device) => console.log(device.name, device.address, device.bonded));
       } catch (err) {
         console.error(err);
       }

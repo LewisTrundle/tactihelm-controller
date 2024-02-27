@@ -2,7 +2,7 @@ import { SafeAreaView, StatusBar, Linking } from "react-native";
 import { useState } from "react";
 import { OpacityButton, DebugHelmetModal, DebugSensorModal } from "../components";
 import { useBC } from '../utils';
-import { styles } from "../styles";
+import { settingsScreenStyles } from "../styles";
 
 
 const SetingsScreen = ({ navigation }) => {
@@ -12,7 +12,7 @@ const SetingsScreen = ({ navigation }) => {
 
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={settingsScreenStyles.container}>
       <StatusBar />
       <DebugSensorModal
         title="Debug Sensor"

@@ -9,7 +9,7 @@ const metrics = {
 };
 
 const colors = {
-  grey: '#212427',//'#3F3B4A',
+  grey: '#212427',
   white: '#F6F7FC',
   pink: '#E63462',
   green: '#2a9d8f',
@@ -17,45 +17,28 @@ const colors = {
   orange: '#FC7A1E'
 };
 
-const styles = StyleSheet.create({
-  center: {
-    justifyContent: "center",
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.grey,
-  },
-  heartRateTitleWrapper: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  heartRateTitleText: {
-    fontSize: 30,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginHorizontal: 20,
-    color: "black",
-  },
-  heartRateText: {
-    fontSize: 25,
-    marginTop: 15,
-  },
-  header: {
-    flex: 1,
-    bottom: 50,
-  },
-});
 
 const homeStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.grey,
-    justifyContent: "center",
-    alignItems: "center",
   },
   contentContainer: {
-    flex: 1
+    flex: 1,
+    justifyContent: "space-between",
+    margin: 20
+  },
+  connectButtons: {
+    justifyContent: "center",
+    flexDirection: "row",
+  },
+  rideButton: {
+    bottom: 20
+  },
+  distanceText: {
+    color: colors.white,
+    fontSize: 50,
+    alignSelf: "center",
   },
   footerContainer: {
     backgroundColor: colors.white,
@@ -71,6 +54,14 @@ const homeStyles = StyleSheet.create({
     textAlign: "center",
   }
 });
+
+
+const settingsScreenStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.grey
+  }
+})
 
 const deviceScreenStyles = StyleSheet.create({
   container: {
@@ -129,12 +120,13 @@ const buttonStyles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     height: 50,
+    paddingHorizontal: 5,
     marginHorizontal: 20,
     marginBottom: 5,
     borderRadius: 8,
   },
   secondaryButtonText: {
-    fontSize: 20,
+    fontSize: 18,
     color: colors.white,
   },
   tertiaryButton: {
@@ -188,6 +180,9 @@ const modalStyles = StyleSheet.create({
   confirmButtonText: {
     color: colors.white,
   },
+  center: {
+    justifyContent: "center"
+  }
 });
 
 const debugStyles = StyleSheet.create({
@@ -257,11 +252,6 @@ const labStudyStyles = StyleSheet.create({
     color: colors.white, 
     fontSize: 16,
   },
-
-  tactorsContainer: {
-    margin: 20,
-   // display: "none"
-  },
   distancesContainer: {
     marginTop: 50,
   },
@@ -271,4 +261,4 @@ const labStudyStyles = StyleSheet.create({
   }
 });
 
-export { styles, homeStyles, deviceScreenStyles, buttonStyles, modalStyles, debugStyles, labStudyStyles }
+export { homeStyles, deviceScreenStyles, buttonStyles, modalStyles, debugStyles, labStudyStyles, settingsScreenStyles }

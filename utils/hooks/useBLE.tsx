@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useMemo, useState, useRef, useEffect } from 'react';
 import { BleManager, Device, BleError, Characteristic, Subscription } from "react-native-ble-plx";
 import { getGattUUIDs } from '../helpers/getGattUUIDs';
 
@@ -17,10 +17,10 @@ interface BluetoothLowEnergyApi {
   disconnectFromDevice: (device: Device) => Promise<void>;
   handleConnectPress: (device: Device) => Promise<void>;
   getCharacteristicData: (func: string) => Promise<string | number | null>;
-  removeServiceSubscription: () => void;
+  startListening: (vibrateFunc: any) => void;
+  stopListening: () => void;
   deviceList: Device[];
   connectedDevice: Device | null;
-  threat: any;
 };
 
 const defaultContext: BluetoothLowEnergyApi = {
@@ -30,10 +30,10 @@ const defaultContext: BluetoothLowEnergyApi = {
   disconnectFromDevice: null,
   handleConnectPress: null,
   getCharacteristicData: null,
-  removeServiceSubscription: null,
+  startListening: null,
+  stopListening: null,
   deviceList: null,
   connectedDevice: null,
-  threat: null,
 };
 
 const BLEContext = createContext(defaultContext);
@@ -43,8 +43,12 @@ export const BLEProvider = ({ children }) => {
   const [deviceList, setDeviceList] = useState<Device[]>([]);
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
   const [services, setServices] = useState<Record<string, any>>(null);
+  const threatRef = useRef<Threat | null>(null);
+
+  const [deviceConnectionSubscription, setDeviceConnectionSubscription] = useState<Subscription>(null);
   const [serviceSubscription, setServiceSubscription] = useState<Subscription>(null);
-  const [threat, setThreat] = useState<Threat | null>(null);
+  const [getThreatSubscription, setGetThreatSubscription] = useState<NodeJS.Timeout>(null);
+
 
 
   const isDuplicateDevice = (devices: Device[], nextDevice: Device) =>
@@ -73,6 +77,13 @@ export const BLEProvider = ({ children }) => {
     try {
       const deviceConnection = await bleManager.connectToDevice(device.id);
       await discoverDeviceServices(deviceConnection);
+      setDeviceConnectionSubscription(await bleManager.onDeviceDisconnected(device.id, (error: BleError, device: Device) => {
+        if (error != null) {
+          console.log("Encountered an error", error)
+        } else {
+          console.log("Device has been successfully disconnected")
+        }
+      }));
       setConnectedDevice(deviceConnection);
       stopScan();
     } catch (e) {
@@ -82,9 +93,9 @@ export const BLEProvider = ({ children }) => {
 
   const disconnectFromDevice = async (): Promise<void> => {
     try {
+      removeSubscriptions(["DEVICE_CONNECTION", "SERVICE", "GET_THREAT"]);
       const unconnectedDevice = await connectedDevice.cancelConnection();
       setConnectedDevice(null);
-      console.log("device has been disconnected: " + unconnectedDevice)
     } catch (err) {
       console.log("FAILED TO DISCONNECT", JSON.stringify(err));
     }
@@ -123,29 +134,6 @@ export const BLEProvider = ({ children }) => {
     }
   };
 
-  
-  // const updateThreats = (newThreat: Threat) => {
-  //   setThreats((prevData) => {
-  //     const existingObjectIndex = prevData.findIndex(obj => obj.id === newThreat.id);
-
-  //     if (existingObjectIndex !== -1) {
-  //       const preData = [...prevData];
-  //       if (newThreat.distance <= 5) {
-  //         preData.splice(existingObjectIndex, 1);     // remove threat
-  //       } else {
-  //         preData[existingObjectIndex] = newThreat;   // update threat
-  //       }
-  //       return preData;
-  //     } else {
-  //       if (newThreat.distance <= 5) {
-  //         return [...prevData]
-  //       } else {
-  //         return [...prevData, newThreat];
-  //       }
-  //     }
-  //   });
-  // };
-
 
   const onSensorUpdate = (error: BleError | null, characteristic: Characteristic | null) => {
     if (error) {
@@ -172,7 +160,7 @@ export const BLEProvider = ({ children }) => {
         return nearest;
       }
     }, null);
-    setThreat(t)
+    threatRef.current = t;
   };
 
 
@@ -239,11 +227,6 @@ export const BLEProvider = ({ children }) => {
     }
   };
 
-  const removeServiceSubscription = (): void => {
-    serviceSubscription.remove();
-    setServiceSubscription(null);
-  }
-
 
   const handleConnectPress = async (device: Device): Promise<void> => {
     if (connectedDevice) {
@@ -254,9 +237,36 @@ export const BLEProvider = ({ children }) => {
   };
 
 
+  const startListening = (vibrateFunc: any): void => {
+    getCharacteristicData("getSensorData");
+    setGetThreatSubscription(setInterval(() => {
+      vibrateFunc(threatRef.current)
+    }, 2000));
+  };
+
+  const stopListening = (): void => {
+    removeSubscriptions(["SERVICE", "GET_THREAT"]);
+  };
+
+  const removeSubscriptions = (subscriptions: string[]): void => {
+    for (const sub of subscriptions) {
+      if (sub==="DEVICE_CONNECTION" && deviceConnectionSubscription) {
+        deviceConnectionSubscription.remove();
+        setDeviceConnectionSubscription(null);
+      } else if (sub==="SERVICE" && serviceSubscription) {
+        serviceSubscription.remove();
+        setServiceSubscription(null);
+      } else if (sub==="GET_THREAT" && getThreatSubscription) {
+        clearInterval(getThreatSubscription);
+        setGetThreatSubscription(null);
+      }
+    }
+  };
+
+
   const bleApi: BluetoothLowEnergyApi = { startScan, stopScan, connectToDevice, 
-    disconnectFromDevice, handleConnectPress, getCharacteristicData, removeServiceSubscription,
-    deviceList, connectedDevice, threat };
+    disconnectFromDevice, handleConnectPress, getCharacteristicData, 
+    startListening, stopListening, deviceList, connectedDevice };
 
 
   return (
