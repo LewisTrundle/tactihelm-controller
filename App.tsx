@@ -2,7 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { HomeScreen, DeviceScreen, SettingsScreen, LabStudyScreen } from './screens';
 import { IconButton } from './components/atoms/IconButton';
-import { BLEProvider, BCProvider } from './utils';
+import { BLEProvider, BCProvider, CommandProvider } from './utils';
 
 
 function App() {
@@ -11,21 +11,20 @@ function App() {
   return (
     <BLEProvider>
     <BCProvider>
+    <CommandProvider>
     <NavigationContainer>
       <Stack.Navigator initialRouteName='Home'>
         <Stack.Screen 
           name="Home"
           component={HomeScreen}
           options={({ navigation }) => ({
-            title: "Tactihelm",
+            title: "TactiHelm",
             headerRight: () => (
               <IconButton iconName="settings-outline" onPress={()=>navigation.navigate("Settings")} size={30} color="black" />
             ),
             headerTitleAlign: 'center',
-
           })}
         />
-
 
         <Stack.Screen 
           name="Device"
@@ -59,6 +58,7 @@ function App() {
 
       </Stack.Navigator>
     </NavigationContainer>
+    </CommandProvider>
     </BCProvider>
     </BLEProvider>
   );

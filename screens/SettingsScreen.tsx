@@ -1,19 +1,21 @@
 import { SafeAreaView, StatusBar, Linking } from "react-native";
 import { useState } from "react";
-import { OpacityButton, DebugHelmetModal, DebugSensorModal } from "../components";
+import { OpacityButton, DebugHelmetModal, DebugSensorModal, CommandOptionsModal } from "../components";
 import { useBC } from '../utils';
 import { settingsScreenStyles } from "../styles";
 
 
-const SetingsScreen = ({ navigation }) => {
+const SettingsScreen = ({ navigation }) => {
   const { openBluetoothSettings } = useBC();
   const [isDebugSensorModalOpen, setIsDebugSensorModalOpen] = useState<boolean>(false);
   const [isDebugHelmetModalOpen, setIsDebugHelmetModalOpen] = useState<boolean>(false);
+  const [isCommandOptionsModalOpen, setIsCommandOptionsModalOpen] = useState<boolean>(false);
 
 
   return (
     <SafeAreaView style={settingsScreenStyles.container}>
       <StatusBar />
+
       <DebugSensorModal
         title="Debug Sensor"
         visible={isDebugSensorModalOpen}
@@ -24,6 +26,12 @@ const SetingsScreen = ({ navigation }) => {
         visible={isDebugHelmetModalOpen}
         onClose={() => setIsDebugHelmetModalOpen(false)}
       />
+      <CommandOptionsModal
+        title="Set Command Options"
+        visible={isCommandOptionsModalOpen}
+        onConfirm={() => setIsCommandOptionsModalOpen(false)}
+      />
+
       <OpacityButton 
         text="Open permissions"
         onPress={()=> Linking.openSettings()}
@@ -49,8 +57,13 @@ const SetingsScreen = ({ navigation }) => {
         onPress={()=> navigation.navigate("LabStudy")}
         style={"primary"}
       />
+      <OpacityButton 
+        text="Set Command Options"
+        onPress={()=> setIsCommandOptionsModalOpen(true)}
+        style={"primary"}
+      />
     </SafeAreaView>
   );
 }
 
-export default SetingsScreen;
+export default SettingsScreen;

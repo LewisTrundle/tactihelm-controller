@@ -1,11 +1,11 @@
+import Icon from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView, StatusBar, View, Text, TouchableWithoutFeedback } from "react-native";
 import { OpacityButton } from "../atoms/OpacityButton";
 import { ItemList } from "../molecules/ItemList";
 import { deviceScreenStyles } from "../../styles";
-import Icon from 'react-native-vector-icons/Ionicons';
 
 
-type DeviceInfoScreenProps = {
+type DeviceInfoPageProps = {
   connectedDevice: any;
   selectedDevice: any;
   deviceList: any[];
@@ -14,8 +14,8 @@ type DeviceInfoScreenProps = {
   handleSettingsPress: any;
 }
 
-export const DeviceInfoScreen = ({connectedDevice, selectedDevice, deviceList, 
-  handleItemPress, handleConnectPress, handleSettingsPress}: DeviceInfoScreenProps) => {
+export const DeviceInfoPage = ({connectedDevice, selectedDevice, deviceList, 
+  handleItemPress, handleConnectPress, handleSettingsPress}: DeviceInfoPageProps) => {
 
   return (
     <TouchableWithoutFeedback onPress={() => handleItemPress(null)}>

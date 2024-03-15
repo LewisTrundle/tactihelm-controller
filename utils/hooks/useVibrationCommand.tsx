@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, createContext, useContext } from 'react';
 import { getEnumType } from '../helpers/enumHelpers';
-import { Pattern, Scheme, Tactor, ActivationType, AttributeList, Command } from "../../constants";
+import { Pattern, Scheme, Tactor, ActivationType, AttributeList, Command, Threat, DistanceUnit, SpeedUnit } from "../../constants";
 
 const Attributes: AttributeList = {
   intensity: { key: "intensity", name: "Intensity", description: "The strength of a vibration.", 
@@ -13,6 +13,10 @@ const Attributes: AttributeList = {
     defaultValue: 1, minValue: 0, maxValue: 10, step: 1, currentValue: 1},
   rhythmDelay: { key: "rhythmDelay", name: "Inter-Rhythm Interval / Rhythm Delay", description: "The time between consecutive rhythms in a cue.", units: "ms", 
     defaultValue: 100, minValue: 0, maxValue: 500, step: 50, currentValue: 100},
+  lowerThreshold: { key: "lowerThreshold", name: "Lower Threshold", description: "The f.d. value which separates imminent from near.", units: "ms", 
+    defaultValue: 1500, minValue: 500, maxValue: 2500, step: 100, currentValue: 1500},
+  upperThreshold: { key: "upperThreshold", name: "Upper Threshold", description: "The f.d. value which separates near from far.", units: "ms", 
+    defaultValue: 3000, minValue: 1000, maxValue: 5000, step: 100, currentValue: 3000},
 };
 
 interface VibrationCommandApi {
@@ -30,16 +34,48 @@ interface VibrationCommandApi {
   setAttributeUpdated: any;
   commandTextRef: any;
   tactorRef: any
+  calcFollowingDistance: (threat: Threat) => Threat;
+  distanceUnits: DistanceUnit;
+  speedUnits: SpeedUnit;
+  setDistanceUnits: any;
+  setSpeedUnits: any;
+};
+
+const defaultContext: VibrationCommandApi = {
+  pattern: null,
+  scheme: null,
+  tactor: null,
+  activationType: null,
+  attributes: null,
+  commandText: null,
+  updateCounter: null,
+  updateAttribute: null,
+  updateCommand: null,
+  setTactor: null,
+  updateCommandText: null,
+  setAttributeUpdated: null,
+  commandTextRef: null,
+  tactorRef: null,
+  calcFollowingDistance: null,
+  distanceUnits: null,
+  speedUnits: null,
+  setDistanceUnits: null,
+  setSpeedUnits: null,
 };
 
 
-export function useVibrationCommand(): VibrationCommandApi {
-  const [pattern, setPattern] = useState<Pattern>(Pattern.SINGLE);
-  const [scheme, setScheme] = useState<Scheme>(Scheme.CUSTOM);
+const CommandContext = createContext(defaultContext);
+
+
+export const CommandProvider = ( { children }) => {
+  const [pattern, setPattern] = useState<Pattern>(Pattern.WAVE);
+  const [scheme, setScheme] = useState<Scheme>(Scheme.VARYING);
   const [tactor, setTactor] = useState<Tactor | null>(Tactor.REAR);
   const [activationType, setActivationType] = useState<ActivationType>(ActivationType.MANUAL);
   const [attributes, setAttributes] = useState<AttributeList>(Attributes);
   const [commandText, setCommandText] = useState<Command | string>('');
+  const [distanceUnits, setDistanceUnits] = useState<DistanceUnit>("metres");
+  const [speedUnits, setSpeedUnits] = useState<SpeedUnit>("kmh");
 
   const [attributeUpdated, setAttributeUpdated] = useState(false);  // only updateCommand once
   const [updateCounter, setUpdateCounter] = useState<number>(0);    // triggers useEffect even if command not updated
@@ -50,6 +86,26 @@ export function useVibrationCommand(): VibrationCommandApi {
   useEffect(() => {
     tactorRef.current = tactor;
   }, [tactor]);
+
+
+  // convert distance to metres and speed to ms-1 to calculate the following distance in seconds
+  const calcFollowingDistance = (threat: Threat): Threat => {
+    let distance = threat.distance;
+    if (distanceUnits == "kilometers") distance = distance * 1000;
+    else if (distanceUnits == "miles") distance = distance * 1609.34;
+    let speed = threat.speed;
+    if (speedUnits == "kmh") speed = speed / 3.6;
+    else if (speedUnits == "mph") speed = speed / 2.237;
+
+    const fd = distance/speed
+    return { ...threat, ...{
+      distanceUnits: distanceUnits,
+      distanceString: `${Number(distance.toFixed(2))} m`,
+      speedUnits: speedUnits,
+      speedString: `${Number(speed.toFixed(2))} ms-1`, 
+      followingDistance: Number(fd.toFixed(2))} }
+  };
+
 
 
   const updateAttribute = (key: string, value: number): void => {
@@ -116,7 +172,8 @@ export function useVibrationCommand(): VibrationCommandApi {
   }, [pattern, tactor, attributes, attributeUpdated]);
 
 
-  return {
+
+  const commandApi: VibrationCommandApi = {
     pattern,
     scheme,
     tactor,
@@ -130,6 +187,27 @@ export function useVibrationCommand(): VibrationCommandApi {
     updateCommand,
     setTactor,
     updateCommandText,
-    setAttributeUpdated
+    setAttributeUpdated,
+    calcFollowingDistance,
+    distanceUnits,
+    speedUnits,
+    setDistanceUnits,
+    setSpeedUnits,
+  };
+
+
+  return (
+    <CommandContext.Provider value={commandApi}>
+      {children}
+    </CommandContext.Provider>
+  );
+};
+
+
+export const useVibrationCommand = () => {
+  const command = useContext(CommandContext);
+  if (!command) {
+    throw new Error('command must be used within a CommandProvider');
   }
-}
+  return command;
+};

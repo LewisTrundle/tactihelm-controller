@@ -1,5 +1,6 @@
 import { View, Text } from "react-native";
 import SelectDropdown from 'react-native-select-dropdown';
+import { labStudyStyles }  from '../../styles';
 
 type CustomSelectDropdownProps = {
   data: any[];
@@ -11,13 +12,13 @@ type CustomSelectDropdownProps = {
   dropdownStyle?: any;
   containerStyle?: any;
   title?: string;
-  titleStyle?: any;
+  titleColor?: any;
 }
 
-export const CustomSelectDropdown = ({ data, onSelect, buttonText, defaultValue, canSearch, buttonStyle, dropdownStyle, containerStyle, title, titleStyle }: CustomSelectDropdownProps) => {
+export const CustomSelectDropdown = ({ data, onSelect, buttonText, defaultValue, canSearch, buttonStyle, dropdownStyle, containerStyle, title, titleColor="white" }: CustomSelectDropdownProps) => {
   return (
     <View style={containerStyle}>
-      {title && <Text style={titleStyle}>{title}</Text>}
+      {title && <Text style={[labStudyStyles.text, { color: titleColor }]}>{title}</Text>}
       <SelectDropdown
         data={data}
         onSelect={(selectedItem, index) => { onSelect(selectedItem) }}

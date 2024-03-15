@@ -12,7 +12,7 @@ type DebugSensorModalProps = {
 };
 
 export const DebugSensorModal = ({title, visible, onClose}: DebugSensorModalProps) => {
-  const { connectedDevice, getCharacteristicData } = useBLE();
+  const { getCharacteristicData } = useBLE();
   const [deviceName, setDeviceName] = useState<string>('');
   const [deviceAppearance, setDeviceAppearance] = useState<string>('');
   const [connectionParameters, setConnectionParameters] = useState<string>('');
@@ -20,7 +20,6 @@ export const DebugSensorModal = ({title, visible, onClose}: DebugSensorModalProp
 
   const getDeviceData = async (func: string, setData: any): Promise<void> => {
     const data = await getCharacteristicData(func);
-
     if (data) {
       setData(data);
     }

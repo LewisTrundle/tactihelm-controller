@@ -15,7 +15,7 @@ type CustomSliderProps = {
 }
 
 export const CustomSlider = ({ onSlidingComplete, startingValue=0, minValue=0, maxValue=10, stepValue=1, 
-  textColor="black", minTrackColor="white", maxTrackColor="black", alterValue=1 }: CustomSliderProps) => {
+  textColor="white", minTrackColor="white", maxTrackColor="black", alterValue=1 }: CustomSliderProps) => {
   const [sliderValue, setSliderValue] = useState<number>(startingValue);
   return (
     <View style={{flexDirection: "row", justifyContent: 'center', alignItems: 'center'}}>

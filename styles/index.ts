@@ -42,7 +42,7 @@ const homeStyles = StyleSheet.create({
   },
   footerContainer: {
     backgroundColor: colors.white,
-    height: 60,
+    height: 110,
     width: "100%",
     bottom: 30,
   },
@@ -258,6 +258,9 @@ const labStudyStyles = StyleSheet.create({
 
   largeText: {
     fontSize: 24
+  },
+  blackText: {
+    color: "black"
   }
 });
 

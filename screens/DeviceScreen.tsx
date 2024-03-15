@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useBLE, useBC, usePermissions, useSelectedItem } from "../utils";
-import { DeviceInfoScreen } from "../components";
+import { DeviceInfoPage } from "../components";
 import { BluetoothTypes } from "../constants";
 
 const DeviceScreen = ({ navigation, route }) => {
@@ -26,7 +26,7 @@ const DeviceScreen = ({ navigation, route }) => {
 
 
   return (
-    <DeviceInfoScreen 
+    <DeviceInfoPage 
       connectedDevice={connectedDevice}
       selectedDevice={selectedItem}
       deviceList={deviceList}

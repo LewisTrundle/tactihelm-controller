@@ -13,7 +13,7 @@ const LabStudyScreen = () => {
 
   const { pattern, scheme, tactor, activationType, attributes, commandText, updateCounter,
     updateAttribute, updateCommand, updateCommandText, setTactor, setAttributeUpdated } = useVibrationCommand();
-  let { intensity, stimulusDuration, isi, repetitions, rhythmDelay } = attributes;
+  let { intensity, stimulusDuration, isi, repetitions, rhythmDelay, lowerThreshold, upperThreshold } = attributes;
   
   const { scenario, playingScenario, scenarioActive, answer,
     updateScenario, playScenario, addAnswer, updateAnswer, submitAnswer } = useScenario();
@@ -110,7 +110,6 @@ const LabStudyScreen = () => {
               buttonStyle={labStudyStyles.dropdownButton}
               containerStyle={labStudyStyles.dropdownContainer}
               title={"Condition Order"}
-              titleStyle={labStudyStyles.text}
             />
             <Text style={[labStudyStyles.text, labStudyStyles.smallText]}>{order}</Text>
           </View>
@@ -124,7 +123,6 @@ const LabStudyScreen = () => {
               buttonStyle={labStudyStyles.dropdownButton}
               containerStyle={labStudyStyles.dropdownContainer}
               title={"Pattern"}
-              titleStyle={labStudyStyles.text}
             />
             <CustomSelectDropdown
               data={enumToArray(Scheme)}
@@ -134,7 +132,6 @@ const LabStudyScreen = () => {
               buttonStyle={labStudyStyles.dropdownButton}
               containerStyle={labStudyStyles.dropdownContainer}
               title={"Duration Scheme"}
-              titleStyle={labStudyStyles.text}
             />
           </View>
         

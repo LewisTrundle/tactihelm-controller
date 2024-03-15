@@ -2,9 +2,8 @@ import { View } from 'react-native';
 import { useState } from "react";
 import { debugStyles }  from '../../styles';
 import { Input } from 'react-native-elements';
-import { AlertModal } from "../molecules/AlertModal";
-import { IconButton } from "../atoms/IconButton";
-import { CustomSlider } from '../atoms/CustomSlider';
+import { AlertModal } from "../molecules";
+import { IconButton } from "../atoms";
 import { useBC } from '../../utils';
 
 type DebugHelmetModalProps = {

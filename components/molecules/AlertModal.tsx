@@ -1,4 +1,4 @@
-import { View, Modal, TouchableOpacity, Text } from 'react-native';
+import { View, Modal, TouchableOpacity, Text, ScrollView } from 'react-native';
 import { modalStyles }  from '../../styles';
 
 type AlertModalProps = {
@@ -14,6 +14,7 @@ type AlertModalProps = {
 export const AlertModal = ({title, children, visible, onConfirm, onClose, confirmText="Ok", cancelText="Cancel"}: AlertModalProps) => {
   return (
     <Modal visible={visible} animationType='fade' onRequestClose={onClose} transparent={true} >
+      <ScrollView>
       <View style={modalStyles.container}>
         <View style={modalStyles.content}>
           <Text style={modalStyles.titleText}>{title}</Text>
@@ -32,6 +33,7 @@ export const AlertModal = ({title, children, visible, onConfirm, onClose, confir
           </View>
         </View>
       </View>
+      </ScrollView>
     </Modal>
   )
 };
