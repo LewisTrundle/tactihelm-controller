@@ -25,7 +25,7 @@ export default {
       "foregroundImage": "./assets/adaptive-icon.png",
       "backgroundColor": "#ffffff"
     },
-    "package": IS_DEV ? ANDROID_PACKAGE + ".dev" : ANDROID_PACKAGE
+    "package": VARIANT==="development" ? ANDROID_PACKAGE + ".dev" : ANDROID_PACKAGE
   },
   "web": {
     "favicon": "./assets/favicon.png"
