@@ -12,7 +12,7 @@ type AttributeSliderProps = {
   altElement?: any;
 }
 
-export const AttributeSlider = ({ attribute, updateAttribute, textColor, minTrackColor, maxTrackColor, altElement, renderCondition=true }: AttributeSliderProps) => {
+export const AttributeSlider = ({ attribute, updateAttribute, textColor="white", minTrackColor, maxTrackColor, altElement, renderCondition=true }: AttributeSliderProps) => {
   const handleSliderChange = (value: number) => {
     updateAttribute(attribute.key, value);
   };

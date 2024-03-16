@@ -97,13 +97,18 @@ export const CommandProvider = ( { children }) => {
     if (speedUnits == "kmh") speed = speed / 3.6;
     else if (speedUnits == "mph") speed = speed / 2.237;
 
-    const fd = distance/speed
+    const fd = (distance/speed)*1000;
     return { ...threat, ...{
       distanceUnits: distanceUnits,
-      distanceString: `${Number(distance.toFixed(2))} m`,
+      distanceMeters: `${Number(distance.toFixed(2))} m`,
+      distanceMiles: `${Number((distance/1609.34).toFixed(2))} miles`,
+      distanceKilometers: `${Number((distance/1000).toFixed(2))} km`,
       speedUnits: speedUnits,
-      speedString: `${Number(speed.toFixed(2))} ms-1`, 
-      followingDistance: Number(fd.toFixed(2))} }
+      speedMS: `${Number(speed.toFixed(2))} ms-1`,
+      speedMPH: `${Number((speed*2.237).toFixed(2))} mph`,
+      speedKMH: `${Number((speed*3.6).toFixed(2))} kmh`,
+      followingDistance: Number(fd.toFixed(2))} 
+    }
   };
 
 

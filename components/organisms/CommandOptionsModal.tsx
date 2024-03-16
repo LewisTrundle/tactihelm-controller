@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { CustomSelectDropdown } from '../atoms';
 import { AlertModal, AttributeSlider } from "../molecules";
 import { useVibrationCommand, enumToArray } from "../../utils";
@@ -21,12 +21,27 @@ export const CommandOptionsModal = ({title, visible, onClose, onConfirm}: Comman
   let { intensity, stimulusDuration, isi, lowerThreshold, upperThreshold } = attributes;
   const attributeList = [lowerThreshold, upperThreshold, intensity, stimulusDuration, isi ];
 
+  const resetToDefaults = () => {
+    updateCommand("WAVE");
+    updateCommand("VARYING");
+    setDistanceUnits("metres");
+    setSpeedUnits("kmh");
+    attributeList.forEach((att, index) => {
+      updateAttribute(att.key, att.defaultValue);
+    });
+  };
+
   return (
     <AlertModal
       title={title}
       visible={visible}
-      onClose={onClose}
+      onClose={() => {
+        onClose()
+        resetToDefaults()
+      }}
+      cancelText={"Reset to defaults"}
       onConfirm={onConfirm}
+      scrollable={true}
     >
       <View style={debugStyles.container}>
 

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useBLE, useBC, usePermissions, useVibrationCommand } from '../utils';
 import { AlertModal, OpacityButton } from "../components";
 import { homeStyles } from "../styles";
-import { BluetoothTypes, Threat } from "../constants";
+import { BluetoothTypes, Threat, Distance, Tactor } from "../constants";
 
 
 const HomeScreen = ({ navigation }) => {
@@ -19,7 +19,9 @@ const HomeScreen = ({ navigation }) => {
   const [showConnectDevicesModal, setShowConnectedDevicesModal] = useState<boolean>(false);
   const isFocused = useIsFocused();
 
-  const [message, setMessage] = useState<string>('');
+  const startRideMessage: string = "Start a ride to start looking for vehicles";
+  const [message, setMessage] = useState<string>(startRideMessage);
+  const [threat, setThreat] = useState<Threat | null>(null);
 
 
   useEffect(() => {
@@ -34,36 +36,43 @@ const HomeScreen = ({ navigation }) => {
 
   
   const parseThreat = (detectedThreat: Threat): void => {
-    const convertFollowingDistanceToCommand = (fd: number, lt: number, ut: number): void => {
-      let tac;
-      if (fd <= lt) tac = "FRONT";
-      else if (fd > lt && fd <= ut) tac = "MID";
-      else tac = "REAR";
-
-      tac=="FRONT" ? setMessage("IMMINENT") : tac=="MID" ? setMessage("NEAR") : setMessage("FAR");
-      // if tactor is has changes, then send update command
-      if (tactorRef.current != tac) {
-        updateCommand(tac);
-        const n_tactor: number = tac=="REAR" ? 1 : tac=="MID" ? 2 : 3;
-        updateAttribute("repetitions", n_tactor)
-        setAttributeUpdated(true);
-        writeToDevice(commandTextRef.current);
-      }
+    const getDistanceCategory = (fd: number, lt: number, ut: number): Distance => {
+      if (fd <= lt) return Distance.IMMINENT;
+      else if (fd > lt && fd <= ut) return Distance.NEAR;
+      else return Distance.FAR;
+    };
+    const getTactorCategory = (dis: Distance): Tactor => {
+      if (dis=="IMMINENT") return Tactor.FRONT;
+      else if (dis=="NEAR") return Tactor.MID;
+      else if (dis=="FAR") return Tactor.REAR;
     };
 
     if (!detectedThreat) return;
-    const threat = calcFollowingDistance(detectedThreat);
-    console.log(threat);
-    convertFollowingDistanceToCommand(threat.followingDistance*1000, lowerThreshold.currentValue, upperThreshold.currentValue);
+    let threat = calcFollowingDistance(detectedThreat);
+    const dis = getDistanceCategory(threat.followingDistance, lowerThreshold.currentValue, upperThreshold.currentValue);
+    const tac = getTactorCategory(dis);
+    threat = { ... threat, ...{ distanceCategory: dis, tactor: tac }};
+
+    // if tactor is has changes, then send update command
+    let shouldVibrate = false;
+    if (tactorRef.current != tac) {
+      updateCommand(tac);
+      const n_tactor: number = tac=="REAR" ? 1 : tac=="MID" ? 2 : 3;
+      updateAttribute("repetitions", n_tactor);
+      setAttributeUpdated(true);
+      shouldVibrate = true;
+      writeToDevice(commandTextRef.current);
+    }
+    threat = { ... threat, ...{ vibrate: shouldVibrate }};
+    setThreat(threat);
   };
 
 
-
   const startRide = (): void => {
-    // if (!(bleConnectedDevice && bcConnectedDevice)) {
-    //   setShowConnectedDevicesModal(true);
-    //   return;
-    // }
+    if (!(bleConnectedDevice && bcConnectedDevice)) {
+      setShowConnectedDevicesModal(true);
+      return;
+    }
     setRideStarted(true);
     setMessage('Looking for vehicles')
     startListening(parseThreat);
@@ -71,7 +80,8 @@ const HomeScreen = ({ navigation }) => {
 
   const endRide = (): void => {
     setRideStarted(false);
-    setMessage('');
+    setThreat(null);
+    setMessage(startRideMessage);
     stopListening();
   };
 
@@ -113,7 +123,18 @@ const HomeScreen = ({ navigation }) => {
           />
         </View>
 
-        <Text style={homeStyles.distanceText}>{message}</Text>
+        {threat ? (
+          <View style={homeStyles.threatContent}>
+            <Text style={homeStyles.distanceText}>{threat.distanceCategory}</Text>
+            <Text style={[homeStyles.distanceText, homeStyles.threatText]}>ID: {threat.id}</Text>
+            <Text style={[homeStyles.distanceText, homeStyles.threatText]}>Vibrate: {threat.vibrate ? 'Yes' : 'No'}</Text>
+            <Text style={[homeStyles.distanceText, homeStyles.threatText]}>Distance: {threat.distanceMeters} ({threat.distanceMiles}) ({threat.distanceKilometers})</Text>
+            <Text style={[homeStyles.distanceText, homeStyles.threatText]}>Speed: {threat.speedMS} ({threat.speedMPH}) ({threat.speedKMH})</Text>
+            <Text style={[homeStyles.distanceText, homeStyles.threatText]}>Following Distance: {Number((threat.followingDistance / 1000).toFixed(1))} s</Text>
+          </View>
+        ) : (
+          <Text style={homeStyles.distanceText}>{message}</Text>
+        )}
         
         <View style={homeStyles.rideButton}>
           <OpacityButton 

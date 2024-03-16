@@ -29,6 +29,7 @@ const SettingsScreen = ({ navigation }) => {
       <CommandOptionsModal
         title="Set Command Options"
         visible={isCommandOptionsModalOpen}
+        onClose={() => setIsCommandOptionsModalOpen(false)}
         onConfirm={() => setIsCommandOptionsModalOpen(false)}
       />
 

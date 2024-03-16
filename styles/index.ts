@@ -35,10 +35,16 @@ const homeStyles = StyleSheet.create({
   rideButton: {
     bottom: 20
   },
+  threatContent: {
+    justifyContent: "center",
+  },
   distanceText: {
     color: colors.white,
     fontSize: 50,
-    alignSelf: "center",
+    textAlign: "center"
+  },
+  threatText: {
+    fontSize: 20
   },
   footerContainer: {
     backgroundColor: colors.white,
