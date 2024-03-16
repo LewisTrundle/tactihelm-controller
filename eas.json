@@ -11,10 +11,14 @@
       }
     },
     "preview": {
-      "extends": "development",
+      "developmentClient": true,
+      "distribution": "internal",
       "android": {
         "buildType": "apk",
         "gradleCommand": ":app:assembleRelease"
+      },
+      "env": {
+        "APP_VARIANT": "preview"
       }
     },
     "production": {}

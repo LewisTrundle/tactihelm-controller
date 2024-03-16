@@ -1,9 +1,9 @@
-const IS_DEV = process.env.APP_VARIANT === 'development';
+const VARIANT = process.env.APP_VARIANT;
 const APP_NAME = "TactiHelm Controller";
 const ANDROID_PACKAGE = "com.lewis.trundle.tactihelmcontroller";
 
 export default {
-  "name": IS_DEV ? APP_NAME + " (Dev)" : APP_NAME,
+  "name": VARIANT==="development" ? APP_NAME + " (Dev)" : APP_NAME,
   "slug": "tactihelm-controller",
   "version": "1.0.0",
   "orientation": "portrait",
