@@ -16,7 +16,7 @@ const Attributes: AttributeList = {
   lowerThreshold: { key: "lowerThreshold", name: "Lower Threshold", description: "The f.d. value which separates imminent from near.", units: "ms", 
     defaultValue: 1500, minValue: 500, maxValue: 2500, step: 100, currentValue: 1500},
   upperThreshold: { key: "upperThreshold", name: "Upper Threshold", description: "The f.d. value which separates near from far.", units: "ms", 
-    defaultValue: 3000, minValue: 1000, maxValue: 5000, step: 100, currentValue: 3000},
+    defaultValue: 3500, minValue: 1000, maxValue: 5000, step: 100, currentValue: 3500},
 };
 
 interface VibrationCommandApi {
